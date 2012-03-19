@@ -1,8 +1,13 @@
 package org.openhds.mobileinterop.web;
 
+import java.util.List;
+
 import org.openhds.mobileinterop.dao.FormSubmissionDao;
+import org.openhds.mobileinterop.model.FormSubmission;
 import org.openhds.mobileinterop.model.FormSubmissionSet;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,12 +27,21 @@ public class FormDownloadController {
 	}
 	
 	@RequestMapping(method=RequestMethod.GET)
-	public FormSubmissionSet getFormInstancesForUser() {
+	public ResponseEntity<FormSubmissionSet> getFormInstancesForUser() {
 		SecurityContext context = SecurityContextHolder.getContext();
 		Authentication auth = context.getAuthentication();
 		String user = auth.getName();
-		dao.findSubmissionsByOwner(user);
-		return null;
+		
+		List<FormSubmission> submissions = dao.findSubmissionsByOwner(user);
+		if (submissions.size() == 0) {
+			return new ResponseEntity<FormSubmissionSet>(HttpStatus.NOT_FOUND);
+		}
+		
+		FormSubmissionSet set = new FormSubmissionSet();
+		for(FormSubmission submission : submissions) {
+			set.addSubmission(submission);
+		}
+		
+		return new ResponseEntity<FormSubmissionSet>(set, HttpStatus.OK);		
 	}
-
 }
