@@ -1,4 +1,4 @@
-package org.openhds.mobileinterop.web;
+package org.openhds.mobileinterop.web.api;
 
 import java.util.List;
 
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
-@RequestMapping("/form-download")
+@RequestMapping("/form")
 public class FormDownloadController {
 	
 	private FormSubmissionDao dao;
@@ -26,7 +26,7 @@ public class FormDownloadController {
 		this.dao = dao;
 	}
 	
-	@RequestMapping(method=RequestMethod.GET)
+	@RequestMapping(value="/download", method=RequestMethod.GET)
 	public ResponseEntity<FormSubmissionSet> getFormInstancesForUser() {
 		SecurityContext context = SecurityContextHolder.getContext();
 		Authentication auth = context.getAuthentication();

@@ -7,6 +7,7 @@
 
   <http>
     <http-basic />
+    <intercept-url pattern="/api/**" access="ROLE_ADMIN,ROLE_FIELDWORKER" />
     <intercept-url pattern="/**" access="ROLE_USER" />
   </http>
 

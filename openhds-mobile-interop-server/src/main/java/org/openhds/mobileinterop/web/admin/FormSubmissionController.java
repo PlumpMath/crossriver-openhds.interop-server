@@ -1,4 +1,4 @@
-package org.openhds.mobileinterop.web;
+package org.openhds.mobileinterop.web.admin;
 import javax.servlet.http.HttpServletResponse;
 
 import org.openhds.mobileinterop.dao.FormSubmissionDao;
@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.ModelAndView;
 
 
 /**
@@ -29,7 +30,14 @@ public class FormSubmissionController {
 	
 	@RequestMapping(method=RequestMethod.POST)
 	public void handleFormSubmission(@RequestBody FormSubmission submission, HttpServletResponse response) {
-		logger.debug(submission.toString());
+		submission.setFormOwnerId(submission.getFormOwnerId().toUpperCase());
 		dao.saveFormSubmission(submission);
+	}
+	
+	@RequestMapping(value = "/list", method = RequestMethod.GET)
+	public ModelAndView getFormSubmissionList() {
+		ModelAndView mv = new ModelAndView("viewFormSubmissions");
+		mv.addObject("submissions", dao.findAllFormSubmissions(50));
+		return mv;
 	}
 }

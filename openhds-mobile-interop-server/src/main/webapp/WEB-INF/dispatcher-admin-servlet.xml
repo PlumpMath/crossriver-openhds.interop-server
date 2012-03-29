@@ -10,7 +10,7 @@
                        http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
 
 	<context:annotation-config />
-	<context:component-scan base-package="org.openhds.mobileinterop.web"></context:component-scan>
+	<context:component-scan base-package="org.openhds.mobileinterop.web.admin"></context:component-scan>
 
 	<mvc:annotation-driven />
 

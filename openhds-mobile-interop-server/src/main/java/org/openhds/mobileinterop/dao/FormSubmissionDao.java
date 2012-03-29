@@ -12,4 +12,7 @@ public interface FormSubmissionDao {
 	
 	@Transactional(readOnly=true)
 	public List<FormSubmission> findSubmissionsByOwner(String ownerId);
+
+	@Transactional(readOnly=true)
+	public List<FormSubmission> findAllFormSubmissions(int pageSize);
 }

@@ -51,4 +51,12 @@ public class FormSubmissionDaoImpl implements FormSubmissionDao {
 				.add(Restrictions.eq("submissionStatus",
 						SubmissionStatus.SUBMITTED)).list();
 	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<FormSubmission> findAllFormSubmissions(int pageSize) {
+		return (List<FormSubmission>) getCurrentSession()
+				.createCriteria(FormSubmission.class).setMaxResults(pageSize)
+				.list();
+	}
 }

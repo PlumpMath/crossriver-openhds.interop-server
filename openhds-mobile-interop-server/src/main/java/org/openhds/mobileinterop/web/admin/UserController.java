@@ -1,4 +1,4 @@
-package org.openhds.mobileinterop.web;
+package org.openhds.mobileinterop.web.admin;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -38,14 +38,6 @@ public class UserController {
 	@RequestMapping(value="/create", method=RequestMethod.GET)
 	public ModelAndView getFieldWorkerPage() {
 		return new ModelAndView("fieldWorkerCreate");
-	}
-	
-	@RequestMapping(value="/authenticate", method=RequestMethod.GET)
-	public void authenticateUser(HttpServletResponse response) {
-		response.setStatus(HttpServletResponse.SC_OK);
-		try {
-			response.flushBuffer();
-		} catch (IOException e) { }
 	}
 	
 	@RequestMapping(value="/createFieldWorker", method=RequestMethod.POST)
