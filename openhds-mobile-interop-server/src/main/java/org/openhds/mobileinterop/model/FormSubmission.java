@@ -35,7 +35,9 @@ public class FormSubmission {
 	
 	private String formType;
 	
-	private String formIdentifier;
+	private String odkUri;
+	
+	private String formId;
 	
 	@Column(length=50)
 	private String formOwnerId;
@@ -122,12 +124,20 @@ public class FormSubmission {
 		this.submissionStatus = submissionStatus;
 	}
 	
-	public String getFormIdentifier() {
-		return formIdentifier;
+	public String getOdkUri() {
+		return odkUri;
 	}
 
-	public void setFormIdentifier(String formIdentifier) {
-		this.formIdentifier = formIdentifier;
+	public void setOdkUri(String odkUri) {
+		this.odkUri = odkUri;
+	}
+
+	public String getFormId() {
+		return formId;
+	}
+
+	public void setFormId(String formId) {
+		this.formId = formId;
 	}
 
 	@Override
