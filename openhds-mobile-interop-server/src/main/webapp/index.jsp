@@ -6,8 +6,9 @@
 </head>
 <body>
 	<h3>Mobile Administration</h3>
-	<p>
-		<ul><a href="fieldWorkerCreate.jsp">Create a new User</a></ul>
-	</p>
+	<ul>
+		<li><a href="admin/users/">Manage Server Users</a></li>
+		<li><a href="admin/form-submission/list">View Form Submissions</a></li>
+	</ul>
 </body>
 </html>
