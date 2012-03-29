@@ -59,4 +59,11 @@ public class FormSubmissionDaoImpl implements FormSubmissionDao {
 				.createCriteria(FormSubmission.class).setMaxResults(pageSize)
 				.list();
 	}
+
+	@Override
+	public FormSubmission findFormSubmissionById(long id) {
+		return (FormSubmission) getCurrentSession()
+				.createCriteria(FormSubmission.class)
+				.add(Restrictions.eq("id", id)).uniqueResult();
+	}
 }

@@ -2,6 +2,8 @@ package org.openhds.mobileinterop.web.api;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.openhds.mobileinterop.dao.FormSubmissionDao;
 import org.openhds.mobileinterop.model.FormSubmission;
 import org.openhds.mobileinterop.model.FormSubmissionSet;
@@ -12,19 +14,26 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
 @RequestMapping("/form")
-public class FormDownloadController {
+public class FormApiController {
 	
 	private FormSubmissionDao dao;
 
 	@Autowired
-	public FormDownloadController(FormSubmissionDao dao) {
+	public FormApiController(FormSubmissionDao dao) {
 		this.dao = dao;
 	}
+	
+	@RequestMapping(method=RequestMethod.POST)
+	public void handleFormSubmission(@RequestBody FormSubmission submission, HttpServletResponse response) {
+		submission.setFormOwnerId(submission.getFormOwnerId().toUpperCase());
+		dao.saveFormSubmission(submission);
+	}	
 	
 	@RequestMapping(value="/download", method=RequestMethod.GET)
 	public ResponseEntity<FormSubmissionSet> getFormInstancesForUser() {
@@ -34,7 +43,7 @@ public class FormDownloadController {
 		
 		List<FormSubmission> submissions = dao.findSubmissionsByOwner(user);
 		if (submissions.size() == 0) {
-			return new ResponseEntity<FormSubmissionSet>(HttpStatus.NOT_FOUND);
+			return new ResponseEntity<FormSubmissionSet>(HttpStatus.NO_CONTENT);
 		}
 		
 		FormSubmissionSet set = new FormSubmissionSet();

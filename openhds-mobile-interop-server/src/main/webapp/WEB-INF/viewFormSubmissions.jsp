@@ -16,6 +16,7 @@
 				<th>Form Owner Id</th>
 				<th>Form Status</th>
 				<th>Date Downloaded</th>
+				<th>View</th>
 			</tr>
 			<c:forEach items="${submissions}" var="sub">
 				<tr>
@@ -24,6 +25,7 @@
 					<td>${sub.formOwnerId}</td>
 					<td>${sub.submissionStatus}</td>
 					<td></td>
+					<td><a href="${sub.id}">View Form Submission</a></td>
 				</tr>
 			</c:forEach>
 		</table>

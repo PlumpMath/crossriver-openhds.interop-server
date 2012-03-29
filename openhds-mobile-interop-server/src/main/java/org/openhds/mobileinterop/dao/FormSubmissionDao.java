@@ -15,4 +15,7 @@ public interface FormSubmissionDao {
 
 	@Transactional(readOnly=true)
 	public List<FormSubmission> findAllFormSubmissions(int pageSize);
+
+	@Transactional(readOnly=true)
+	public FormSubmission findFormSubmissionById(long id);
 }
