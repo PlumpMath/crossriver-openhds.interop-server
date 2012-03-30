@@ -5,7 +5,7 @@ import java.util.List;
 import org.openhds.mobileinterop.model.FormSubmission;
 import org.springframework.transaction.annotation.Transactional;
 
-public interface FormSubmissionDao {
+public interface FormDao {
 	
 	@Transactional
 	public void saveFormSubmission(FormSubmission submission);
@@ -18,4 +18,7 @@ public interface FormSubmissionDao {
 
 	@Transactional(readOnly=true)
 	public FormSubmission findFormSubmissionById(long id);
+
+	@Transactional
+	public void updateFormToFixed(String uri);
 }

@@ -39,6 +39,8 @@ public class FormSubmission {
 	
 	private String formId;
 	
+	private String derivedFromUri;
+	
 	@Column(length=50)
 	private String formOwnerId;
 	
@@ -57,8 +59,8 @@ public class FormSubmission {
 		@XmlEnumValue("downloaded")
 		DOWNLOADED("downloaded"),
 		
-		@XmlEnumValue("inactive")
-		INACTIVE("inactive");
+		@XmlEnumValue("fixed")
+		FIXED("fixed");
 		
 		private final String status;
 		
@@ -137,6 +139,14 @@ public class FormSubmission {
 
 	public void setFormId(String formId) {
 		this.formId = formId;
+	}
+
+	public String getDerivedFromUri() {
+		return derivedFromUri;
+	}
+
+	public void setDerivedFromUri(String derivedFromUri) {
+		this.derivedFromUri = derivedFromUri;
 	}
 
 	@Override

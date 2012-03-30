@@ -13,7 +13,7 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.openhds.mobileinterop.dao.FormSubmissionDao;
+import org.openhds.mobileinterop.dao.FormDao;
 import org.openhds.mobileinterop.model.FormSubmission;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,10 +34,10 @@ public class FormAdminController {
 	private final static Logger logger = LoggerFactory
 			.getLogger(FormAdminController.class);
 
-	private FormSubmissionDao dao;
+	private FormDao dao;
 
 	@Autowired
-	public FormAdminController(FormSubmissionDao dao) {
+	public FormAdminController(FormDao dao) {
 		this.dao = dao;
 	}
 

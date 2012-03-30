@@ -1,10 +1,11 @@
 package org.openhds.mobileinterop.web.api;
 
+import java.io.IOException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.openhds.mobileinterop.dao.FormSubmissionDao;
+import org.openhds.mobileinterop.dao.FormDao;
 import org.openhds.mobileinterop.dao.UserDao;
 import org.openhds.mobileinterop.model.FormSubmission;
 import org.openhds.mobileinterop.model.FormSubmissionSet;
@@ -24,11 +25,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @RequestMapping("/form")
 public class FormApiController {
 
-	private FormSubmissionDao dao;
+	private FormDao dao;
 	private UserDao userDao;
 
 	@Autowired
-	public FormApiController(FormSubmissionDao dao, UserDao userDao) {
+	public FormApiController(FormDao dao, UserDao userDao) {
 		this.dao = dao;
 		this.userDao = userDao;
 	}
@@ -44,6 +45,18 @@ public class FormApiController {
 		}
 		submission.setFormOwnerId(previousOwner);
 		dao.saveFormSubmission(submission);
+	}
+	
+	@RequestMapping(value = "/fixed", method = RequestMethod.POST)
+	public void setFormSubmissionToFixed(@RequestBody String uri, HttpServletResponse response) {
+		if (uri != null) {
+			dao.updateFormToFixed(uri);
+		}
+		
+		response.setStatus(HttpServletResponse.SC_OK);
+		try {
+			response.flushBuffer();
+		} catch (IOException e) { }
 	}
 
 	@RequestMapping(value = "/download", method = RequestMethod.GET)
