@@ -5,8 +5,10 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
 import org.openhds.mobileinterop.dao.FormSubmissionDao;
+import org.openhds.mobileinterop.dao.UserDao;
 import org.openhds.mobileinterop.model.FormSubmission;
 import org.openhds.mobileinterop.model.FormSubmissionSet;
+import org.openhds.mobileinterop.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,36 +23,45 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 @RequestMapping("/form")
 public class FormApiController {
-	
+
 	private FormSubmissionDao dao;
+	private UserDao userDao;
 
 	@Autowired
-	public FormApiController(FormSubmissionDao dao) {
+	public FormApiController(FormSubmissionDao dao, UserDao userDao) {
 		this.dao = dao;
+		this.userDao = userDao;
 	}
-	
-	@RequestMapping(method=RequestMethod.POST)
+
+	@RequestMapping(method = RequestMethod.POST)
 	public void handleFormSubmission(@RequestBody FormSubmission submission, HttpServletResponse response) {
-		submission.setFormOwnerId(submission.getFormOwnerId().toUpperCase());
+		// any form that does not have a registered user is automatically
+		// funneled to admin user
+		String previousOwner = submission.getFormOwnerId().toUpperCase();
+		User user = userDao.findUserById(previousOwner);
+		if (user == null) {
+			previousOwner = "admin";
+		}
+		submission.setFormOwnerId(previousOwner);
 		dao.saveFormSubmission(submission);
-	}	
-	
-	@RequestMapping(value="/download", method=RequestMethod.GET)
+	}
+
+	@RequestMapping(value = "/download", method = RequestMethod.GET)
 	public ResponseEntity<FormSubmissionSet> getFormInstancesForUser() {
 		SecurityContext context = SecurityContextHolder.getContext();
 		Authentication auth = context.getAuthentication();
 		String user = auth.getName();
-		
+
 		List<FormSubmission> submissions = dao.findSubmissionsByOwner(user);
 		if (submissions.size() == 0) {
 			return new ResponseEntity<FormSubmissionSet>(HttpStatus.NO_CONTENT);
 		}
-		
+
 		FormSubmissionSet set = new FormSubmissionSet();
-		for(FormSubmission submission : submissions) {
+		for (FormSubmission submission : submissions) {
 			set.addSubmission(submission);
 		}
-		
-		return new ResponseEntity<FormSubmissionSet>(set, HttpStatus.OK);		
+
+		return new ResponseEntity<FormSubmissionSet>(set, HttpStatus.OK);
 	}
 }
