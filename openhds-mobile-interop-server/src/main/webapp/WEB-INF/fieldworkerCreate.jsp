@@ -28,7 +28,6 @@
 			<p>User name:<br /><input type="text" size="50" name="username" value="${formUser == null ? '' : formUser.userName}" /></p>
 			
 			<p>Password:<br /><input type="password" size="50" name="password" value="${formUser == null ? '' : formUser.password}" /></p>
-			<p>Role:</br><select name="role"><option value="admin">Admin</option><option value="fieldworker">Field Worker</option></select></p>
 			<input type="submit" value="Create User" />
 			
 		</form>

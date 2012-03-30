@@ -41,7 +41,7 @@ public class UserController {
 	}
 	
 	@RequestMapping(value="/createFieldWorker", method=RequestMethod.POST)
-	public ModelAndView createFieldWorker(@RequestParam("username")String username, @RequestParam("password") String password, @RequestParam("role") String role) {
+	public ModelAndView createFieldWorker(@RequestParam("username")String username, @RequestParam("password") String password) {
 		ModelAndView mv = new ModelAndView();
 		List<String> errors = new ArrayList<String>();
 		
@@ -65,14 +65,8 @@ public class UserController {
 		}
 		
 		user.setUsername(user.getUsername().toUpperCase());
-		String roleName = null;
-		if ("admin".equals(role)) {
-			roleName = Authority.ADMIN;
-		} else {
-			roleName = Authority.FIELD_WORKER;
-		}
 		
-		dao.saveUser(user, roleName);
+		dao.saveUser(user, Authority.FIELD_WORKER);
 		mv.setViewName("redirect:/admin/users/");
 		return mv;
 	}
