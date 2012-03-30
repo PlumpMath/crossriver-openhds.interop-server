@@ -40,7 +40,7 @@ public class UserController {
 		return new ModelAndView("fieldWorkerCreate");
 	}
 	
-	@RequestMapping(value="/createFieldWorker", method=RequestMethod.POST)
+	@RequestMapping(value="/create", method=RequestMethod.POST)
 	public ModelAndView createFieldWorker(@RequestParam("username")String username, @RequestParam("password") String password) {
 		ModelAndView mv = new ModelAndView();
 		List<String> errors = new ArrayList<String>();
@@ -58,16 +58,25 @@ public class UserController {
 		}
 		
 		if (errors.size() > 0) {
-			mv.setViewName("fieldWorkerCreate");
-			mv.addObject("formUser", user);
-			mv.addObject("errors", errors);
-			return mv;
+			return showPageWithErrors(mv, errors, user);
 		}
 		
 		user.setUsername(user.getUsername().toUpperCase());
 		
-		dao.saveUser(user, Authority.FIELD_WORKER);
+		boolean saved = dao.saveUser(user, Authority.FIELD_WORKER);
+		if (!saved) {
+			errors.add("Already a user registered with that username");
+			return showPageWithErrors(mv, errors, user);
+		}
+		
 		mv.setViewName("redirect:/admin/users/");
+		return mv;
+	}
+
+	private ModelAndView showPageWithErrors(ModelAndView mv, List<String> errors, User user) {
+		mv.setViewName("fieldWorkerCreate");
+		mv.addObject("formUser", user);
+		mv.addObject("errors", errors);
 		return mv;
 	}
 

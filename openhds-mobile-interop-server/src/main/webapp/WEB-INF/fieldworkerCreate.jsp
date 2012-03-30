@@ -7,7 +7,7 @@
 		<script src="jquery-1.7.1.min.js" type="text/javascript"></script>
 	</head>
 	<body>
-		<form action="createFieldWorker.do" method="POST">
+		<form method="POST">
 			<h3>Create a Form User</h3>
 			<c:if test="${success}">
 				<p style="color:green">${success}</p>
@@ -25,7 +25,7 @@
 			</c:if>
 			<p>A form user can download a set of form submissions</p>
 			
-			<p>User name:<br /><input type="text" size="50" name="username" value="${formUser == null ? '' : formUser.userName}" /></p>
+			<p>User name:<br /><input type="text" size="50" name="username" value="${formUser == null ? '' : formUser.username}" /></p>
 			
 			<p>Password:<br /><input type="password" size="50" name="password" value="${formUser == null ? '' : formUser.password}" /></p>
 			<input type="submit" value="Create User" />

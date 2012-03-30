@@ -33,7 +33,13 @@ public class UserDaoImpl implements UserDao {
 	}
 
 	@Override
-	public void saveUser(User user, String roleName) {
+	public boolean saveUser(User user, String roleName) {
+		User previousUser = findUserById(user.getUsername());
+		if (previousUser != null) {
+			return false;
+		}
+		
+		user.setEnabled(true);
 		getCurrentSession().save(user);
 
 		AuthorityPK authorityPK = new AuthorityPK();
@@ -44,6 +50,8 @@ public class UserDaoImpl implements UserDao {
 		authority.setAuthorityPK(authorityPK);
 
 		getCurrentSession().save(authority);
+		
+		return true;
 	}
 
 	@Override

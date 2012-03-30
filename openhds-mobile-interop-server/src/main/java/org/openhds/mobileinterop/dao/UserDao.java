@@ -11,7 +11,7 @@ public interface UserDao {
 	public List<User> getAllUsers();
 
 	@Transactional
-	public void saveUser(User user, String roleName);
+	public boolean saveUser(User user, String roleName);
 
 	@Transactional(readOnly = true)
 	public User findUserById(String previousOwner);
