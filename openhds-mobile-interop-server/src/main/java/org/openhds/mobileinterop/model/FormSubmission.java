@@ -72,7 +72,6 @@ public class FormSubmission {
 		}
 	}
 
-	@XmlTransient
 	public long getId() {
 		return id;
 	}
