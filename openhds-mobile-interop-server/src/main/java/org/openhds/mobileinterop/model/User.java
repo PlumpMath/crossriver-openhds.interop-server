@@ -2,6 +2,8 @@ package org.openhds.mobileinterop.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -10,6 +12,9 @@ import javax.persistence.Table;
 public class User {
 
 	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
+	private long id;
+	
 	@Column(nullable=false, unique=true)
 	private String username;
 	
@@ -17,6 +22,14 @@ public class User {
 	private String password;
 	
 	private boolean enabled;
+
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
 
 	public String getUsername() {
 		return username;
@@ -40,5 +53,17 @@ public class User {
 
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
+	}
+	
+	public boolean validUsername() {
+		return username != null && !(username.trim().isEmpty());
+	}
+	
+	public boolean validPassword() {
+		return password != null && !(password.trim().isEmpty());		
+	}
+	
+	public boolean passwordMatch(String matchPassword) {
+		return password.equals(matchPassword);		
 	}
 }

@@ -7,8 +7,9 @@
 
   <http>
     <http-basic />
+    <intercept-url pattern="/" access="IS_AUTHENTICATED_ANONYMOUSLY" />
     <intercept-url pattern="/api/**" access="ROLE_ADMIN,ROLE_FIELDWORKER" />
-    <intercept-url pattern="/**" access="ROLE_USER" />
+    <intercept-url pattern="/admin/**" access="ROLE_ADMIN" />
   </http>
 
   <authentication-manager>

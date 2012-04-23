@@ -13,7 +13,7 @@
   <context:annotation-config />
 
   <context:component-scan base-package="org.openhds.mobileinterop">
-    <context:exclude-filter type="annotation" expression="org.springframework.web.servlet.mvc.Controller" />
+    <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller" />
   </context:component-scan>
 
   <tx:annotation-driven />
@@ -21,12 +21,14 @@
   <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
     <constructor-arg ref="sessionFactory" />
   </bean>
+  
+  <context:property-placeholder location="classpath:database.properties"/>
 
   <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
-    <property name="driverClassName" value="com.mysql.jdbc.Driver" />
-    <property name="url" value="jdbc:mysql://localhost/mobileinterop" />
-    <property name="username" value="root" />
-    <property name="password" value="test" />
+    <property name="driverClassName" value="${database.jdbc.driver}" />
+    <property name="url" value="${database.jdbc.url}" />
+    <property name="username" value="${database.username}" />
+    <property name="password" value="${database.password}" />
     <property name="validationQuery" value="SELECT 1" />
     <property name="testOnBorrow" value="true" />
   </bean>
@@ -36,7 +38,7 @@
     <property name="packagesToScan" value="org.openhds.mobileinterop.model" />
     <property name="hibernateProperties">
       <props>
-        <prop key="hibernate.hbm2ddl.auto">update</prop>
+        <prop key="hibernate.hbm2ddl.auto">${database.hbm2ddl}</prop>
       </props>
     </property>
   </bean>
