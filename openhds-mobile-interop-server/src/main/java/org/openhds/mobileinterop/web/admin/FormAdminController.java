@@ -26,10 +26,10 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.util.HtmlUtils;
 
 /**
- * Receives a form submission from an external server
+ * Handles administrative GUI tasks relating to form submissions
  */
 @Controller
-@RequestMapping("/form")
+@RequestMapping("/admin/form")
 public class FormAdminController {
 	private final static Logger logger = LoggerFactory
 			.getLogger(FormAdminController.class);

@@ -10,9 +10,11 @@
                        http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
 
 	<context:annotation-config />
-	<context:component-scan base-package="org.openhds.mobileinterop.web.admin"></context:component-scan>
-
 	<mvc:annotation-driven />
+
+	<context:property-placeholder location="classpath:database.properties" />
+
+	<context:component-scan base-package="org.openhds.mobileinterop.web" />
 
 	<bean id="viewResolver"
 		class="org.springframework.web.servlet.view.InternalResourceViewResolver">

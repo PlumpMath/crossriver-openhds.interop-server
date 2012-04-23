@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
-@RequestMapping("/form")
+@RequestMapping("/api/form")
 public class FormApiController {
 
 	private FormDao dao;

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
-@RequestMapping("/user")
+@RequestMapping("/api/user")
 public class UserApiController {
 	
 	@RequestMapping(value="/authenticate", method=RequestMethod.GET)
