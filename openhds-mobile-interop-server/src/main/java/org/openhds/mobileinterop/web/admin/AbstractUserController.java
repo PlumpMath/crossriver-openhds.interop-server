@@ -3,6 +3,7 @@ package org.openhds.mobileinterop.web.admin;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.openhds.mobileinterop.model.User;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.servlet.ModelAndView;
@@ -23,6 +24,16 @@ public abstract class AbstractUserController {
 			errors.add("No username provided");
 		}
 	
+		validatePasswords(user, confirmPassword, errors, true);
+	
+		return errors;
+	}
+
+	protected void validatePasswords(User user, String confirmPassword, List<String> errors, boolean required) {
+		if (!required && StringUtils.isBlank(user.getPassword()) && StringUtils.isBlank(confirmPassword)) {
+			return;
+		}
+		
 		if (!user.validPassword()) {
 			errors.add("No password was provided");
 		}
@@ -30,8 +41,6 @@ public abstract class AbstractUserController {
 		if (!user.passwordMatch(confirmPassword)) {
 			errors.add("Passwords do not match");
 		}
-	
-		return errors;
 	}
 
 	protected ModelAndView showCreatePageWithErrors(List<String> errors, User user) {
@@ -40,7 +49,7 @@ public abstract class AbstractUserController {
 
 	protected ModelAndView addModelObjects(String viewName, List<String> errors, User user) {
 		ModelAndView mv = new ModelAndView(viewName);
-		mv.addObject("formUser", user);
+		mv.addObject("user", user);
 		mv.addObject("errors", errors);
 		 
 		return mv;

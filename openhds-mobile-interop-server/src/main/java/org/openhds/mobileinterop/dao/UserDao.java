@@ -18,4 +18,7 @@ public interface UserDao {
 
 	@Transactional(readOnly = true)
 	public User findUserById(String previousOwner);
+
+	@Transactional
+	public void deleteUser(String username);
 }

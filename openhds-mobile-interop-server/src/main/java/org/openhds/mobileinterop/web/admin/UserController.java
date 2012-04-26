@@ -1,5 +1,6 @@
 package org.openhds.mobileinterop.web.admin;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -50,19 +51,14 @@ public class UserController extends AbstractUserController {
 		if (errors.size() > 0) {
 			return showCreatePageWithErrors(errors, user);
 		}
-	
+
 		User persistedUser = dao.findUserById(user.getUsername());
 		if (persistedUser != null) {
 			errors.add("Already a user registered with that username");
 			return showCreatePageWithErrors(errors, user);
 		}
-		
-		List<String> supervisedFws = formValues.get("supervisedFieldworker");
-		for(String fw : supervisedFws) {
-			if (StringUtils.isNotBlank(fw)) {
-				user.getManagedFieldworkers().add(fw);
-			}
-		}
+
+		addSupervisedFieldWorkers(formValues, user);
 
 		dao.saveUser(user, Authority.SUPERVISOR);
 		ModelAndView mv = new ModelAndView();
@@ -70,11 +66,24 @@ public class UserController extends AbstractUserController {
 		return mv;
 	}
 
+	private void addSupervisedFieldWorkers(MultiValueMap<String, String> formValues, User user) {
+		List<String> supervisedFws = formValues.get("supervisedFieldworker");
+		for (String fw : supervisedFws) {
+			if (StringUtils.isNotBlank(fw)) {
+				user.getManagedFieldworkers().add(fw);
+			}
+		}
+	}
+
 	@RequestMapping("/edit/{username}")
 	public ModelAndView showEditUser(@PathVariable("username") String username) {
+		if ("admin".equalsIgnoreCase(username)) {
+			return redirectToUserList();
+		}
+
 		User user = dao.findUserById(username);
 		if (user == null) {
-			return new ModelAndView("redirect:/admin/users/");
+			return redirectToUserList();
 		}
 
 		ModelAndView mv = new ModelAndView("userEdit");
@@ -86,29 +95,55 @@ public class UserController extends AbstractUserController {
 	@RequestMapping(value = "/edit/{username}", method = RequestMethod.POST)
 	public ModelAndView updateUser(@PathVariable("username") String username,
 			@RequestBody MultiValueMap<String, String> formValues) {
-		
+		formValues.remove("username");
+		formValues.add("username", username);
+
 		User user = getUserFromSubmittedValues(formValues);
-		
-		List<String> errors = validateUser(user, formValues.getFirst("confirmPassword"));
+		addSupervisedFieldWorkers(formValues, user);
+
+		List<String> errors = new ArrayList<String>();
+		validatePasswords(user, formValues.getFirst("confirmPassword"), errors, false);
 		if (errors.size() > 0) {
 			return showEditPageWithErrors(errors, user);
 		}
-		
-		if (!username.equals(user.getUsername())) {
-			User persistedUser = dao.findUserById(user.getUsername());
-			if (persistedUser != null) {
-				errors.add("Cannot change to that username because a user already exist");
-				return showCreatePageWithErrors(errors, user);
-			}
-		}
-		
+
 		dao.updateUser(user);
-		
-		return null;
+
+		return redirectToUserList();
+	}
+
+	private ModelAndView redirectToUserList() {
+		return new ModelAndView("redirect:/admin/users/");
 	}
 
 	private ModelAndView showEditPageWithErrors(List<String> errors, User user) {
 		return addModelObjects("userEdit", errors, user);
 	}
 
+	@RequestMapping("/delete/{username}")
+	public ModelAndView showDeleteUser(@PathVariable("username") String username) {
+		if ("admin".equalsIgnoreCase(username)) {
+			return redirectToUserList();
+		}
+
+		User user = dao.findUserById(username);
+		if (user == null) {
+			return redirectToUserList();
+		}
+
+		ModelAndView mv = new ModelAndView("userDelete");
+		mv.addObject("username", username);
+
+		return mv;
+	}
+
+	@RequestMapping(value = "/delete/{username}", method = RequestMethod.POST)
+	public ModelAndView deleteUser(@PathVariable("username") String username,
+			@RequestBody MultiValueMap<String, String> formValues) {
+		if (formValues.containsKey("delete")) {
+			dao.deleteUser(username);
+		}
+
+		return redirectToUserList();
+	}
 }

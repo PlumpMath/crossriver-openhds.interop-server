@@ -25,7 +25,7 @@ public class UserDaoImpl implements UserDao {
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<User> getAllUsers() {
-		return (List<User>) getCurrentSession().createCriteria(User.class)
+		return (List<User>) getCurrentSession().createCriteria(User.class).add(Restrictions.ne("username", "admin"))
 				.list();
 	}
 
@@ -46,14 +46,14 @@ public class UserDaoImpl implements UserDao {
 		authority.setAuthorityPK(authorityPK);
 
 		getCurrentSession().save(authority);
-		
+
 		return true;
 	}
 
 	@Override
 	public User findUserById(String previousOwner) {
-		return (User) getCurrentSession().createCriteria(User.class)
-				.add(Restrictions.eq("username", previousOwner)).uniqueResult();
+		return (User) getCurrentSession().createCriteria(User.class).add(Restrictions.eq("username", previousOwner))
+				.uniqueResult();
 	}
 
 	@Override
@@ -62,11 +62,19 @@ public class UserDaoImpl implements UserDao {
 		if (savedUser == null) {
 			return false;
 		}
-		
+
 		savedUser.setUsername(user.getUsername());
 		savedUser.setPassword(user.getPassword());
-		
+		savedUser.getManagedFieldworkers().clear();
+		savedUser.getManagedFieldworkers().addAll(user.getManagedFieldworkers());
+
 		return true;
+	}
+
+	@Override
+	public void deleteUser(String username) {
+		User user = findUserById(username);
+		getCurrentSession().delete(user);
 	}
 
 }
