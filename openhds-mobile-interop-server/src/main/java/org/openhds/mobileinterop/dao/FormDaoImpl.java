@@ -137,6 +137,7 @@ public class FormDaoImpl implements FormDao {
 		FormSubmissionGroup group = findGroupByDerivedSubmission(submission);
 		group.completeFormSubmissionGroup(submission);
 		submission.setGroup(group);
+		submission.setActive(false);
 		save(submission);
 	}
 }
