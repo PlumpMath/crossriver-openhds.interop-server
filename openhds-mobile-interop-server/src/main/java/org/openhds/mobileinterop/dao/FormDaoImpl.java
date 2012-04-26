@@ -2,13 +2,16 @@ package org.openhds.mobileinterop.dao;
 
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
 import org.openhds.mobileinterop.model.FormError;
 import org.openhds.mobileinterop.model.FormRevision;
 import org.openhds.mobileinterop.model.FormSubmission;
-import org.openhds.mobileinterop.model.FormSubmission.SubmissionStatus;
+import org.openhds.mobileinterop.model.FormSubmissionGroup;
+import org.openhds.mobileinterop.model.SubmissionStatus;
+import org.openhds.mobileinterop.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,37 +30,61 @@ public class FormDaoImpl implements FormDao {
 
 	@Override
 	public void saveFormSubmission(FormSubmission submission) {
-		save(submission);
-
-		for (FormError error : submission.getFormErrors()) {
-			error.setSubmission(submission);
-			save(error);
+		if (StringUtils.isBlank(submission.getDerivedFromUri())) {
+			FormSubmissionGroup group = FormSubmissionGroup.startNewGroup(submission);
+			submission.setGroup(group);
+			save(group);
+			save(submission);
+		} else {
+			FormSubmissionGroup group = findGroupByDerivedSubmission(submission);
+			group.addSubmission(submission);
+			submission.setGroup(group);
+			
+			for (FormError error : submission.getFormErrors()) {
+				error.setSubmission(submission);
+			}
+			
+			save(submission);
 		}
+	}
 
-		if (submission.getDerivedFromUri() == null || submission.getDerivedFromUri().trim().isEmpty()) {
-			FormRevision revision = new FormRevision();
-			revision.setFirstRevisionUri(submission.getOdkUri());
-			revision.setUri(submission.getOdkUri());
-			save(revision);
+	private FormSubmissionGroup findGroupByDerivedSubmission(FormSubmission submission) {
+		FormSubmission dervivedSubmission = findDerivedSubmission(submission);
+		FormSubmissionGroup group = dervivedSubmission.getGroup();
+		return group;
+	}
+
+	private FormSubmission findDerivedSubmission(FormSubmission submission) {
+		FormSubmission dervivedSubmission = (FormSubmission) getCurrentSession()
+				.createCriteria(FormSubmission.class)
+				.add(Restrictions.eq("odkUri", submission.getDerivedFromUri())).uniqueResult();
+		return dervivedSubmission;
+	}
+
+	private FormRevision discoverRevision(FormSubmission submission) {
+		FormRevision revision = null;
+		if (!submission.hasDerivedUri()) {
+			revision = new FormRevision();
+			revision.asFirstRevision(submission);
 		} else {
 			FormRevision previousRevision = findRevisionByProperty("derivedFromUri", submission.getDerivedFromUri());
-			
+
 			if (previousRevision == null) {
-				// the first revision has its derived from uri property set to null
+				// the first revision has its derived from uri property set to
+				// null
 				// this could be the second revision
 				previousRevision = findRevisionByProperty("firstRevisionUri", submission.getDerivedFromUri());
 			}
-			
+
 			if (previousRevision == null) {
 				logger.warn("Form had derivedFromUri but found no matching form: " + submission.getId());
 			} else {
-				FormRevision newRevision = new FormRevision();
-				newRevision.setFirstRevisionUri(previousRevision.getFirstRevisionUri());
-				newRevision.setDerivedFromUri(previousRevision.getUri());
-				newRevision.setUri(submission.getOdkUri());
-				save(newRevision);
+				revision = new FormRevision();
+				revision.asSiblingRevision(previousRevision, submission.getOdkUri());
 			}
 		}
+
+		return revision;
 	}
 
 	private FormRevision findRevisionByProperty(String propertyName, Object propertyValue) {
@@ -73,22 +100,24 @@ public class FormDaoImpl implements FormDao {
 		return sessionFactory.getCurrentSession();
 	}
 
-	public List<FormSubmission> findSubmissionsByOwner(String ownerId) {
-		return findListSubmissionByOwnerId(ownerId);
-	}
-
 	@SuppressWarnings("unchecked")
-	private List<FormSubmission> findListSubmissionByOwnerId(String ownerId) {
-		return (List<FormSubmission>) getCurrentSession().createCriteria(FormSubmission.class)
-				.add(Restrictions.eq("formOwnerId", ownerId))
-				.add(Restrictions.eq("submissionStatus", SubmissionStatus.SUBMITTED)).list();
+	public List<FormSubmission> findDownloadableSubmissionsForUser(User user) {
+		List<FormSubmission> subs =  (List<FormSubmission>) getCurrentSession().createCriteria(FormSubmission.class)
+				.add(Restrictions.in("formOwnerId", user.getManagedFieldworkers()))
+				.add(Restrictions.eq("active", true)).list();	
+		
+		for(FormSubmission sub : subs) {
+			sub.addDownloadActionToGroup();
+		}
+		
+		return subs;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<FormSubmission> findAllFormSubmissions(int pageSize) {
-		return (List<FormSubmission>) getCurrentSession().createCriteria(FormSubmission.class).setMaxResults(pageSize)
-				.list();
+	public List<FormSubmissionGroup> findAllFormSubmissions(int pageSize) {
+		return (List<FormSubmissionGroup>) getCurrentSession().createCriteria(FormSubmissionGroup.class)
+				.setMaxResults(pageSize).list();
 	}
 
 	@Override
@@ -98,12 +127,16 @@ public class FormDaoImpl implements FormDao {
 	}
 
 	@Override
-	public void updateFormToFixed(String uri) {
-		FormSubmission sub = (FormSubmission) getCurrentSession().createCriteria(FormSubmission.class)
-				.add(Restrictions.eq("odkUri", uri)).uniqueResult();
+	public FormSubmissionGroup findFormSubmissionGroupById(long groupId) {
+		return (FormSubmissionGroup) getCurrentSession().createCriteria(FormSubmissionGroup.class)
+				.add(Restrictions.eq("id", groupId)).uniqueResult();
+	}
 
-		if (sub != null) {
-			sub.setSubmissionStatus(SubmissionStatus.FIXED);
-		}
+	@Override
+	public void completeFormSubmissionGroup(FormSubmission submission) {
+		FormSubmissionGroup group = findGroupByDerivedSubmission(submission);
+		group.completeFormSubmissionGroup(submission);
+		submission.setGroup(group);
+		save(submission);
 	}
 }

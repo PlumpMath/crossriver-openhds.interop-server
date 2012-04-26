@@ -6,10 +6,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 /**
- * A FormGroup is a sequence of form submissions that are related
- * For example, a user might originally download a form with errors
- * and then resubmit it, which in turn causes validation errors. This class
- * captures all related forms over their lifetime
+ * A FormRevision represents the linkage between form submissions
+ * A {@link FormSubmission} can be downloaded a number of times to a phone
  */
 @Entity
 public class FormRevision {
@@ -23,7 +21,9 @@ public class FormRevision {
 	private String derivedFromUri;
 	
 	private String uri;
-
+	
+	public FormRevision() { }
+	
 	public long getId() {
 		return id;
 	}
@@ -54,5 +54,17 @@ public class FormRevision {
 
 	public void setUri(String uri) {
 		this.uri = uri;
+	}
+
+	public void asFirstRevision(FormSubmission submission) {
+		firstRevisionUri = submission.getOdkUri();
+		uri = submission.getOdkUri();		
+	}	
+	
+	public void asSiblingRevision(FormRevision previousRevision, String uri) {
+		firstRevisionUri = previousRevision.firstRevisionUri;
+		derivedFromUri = previousRevision.derivedFromUri;
+		this.uri = uri;
+		
 	}
 }

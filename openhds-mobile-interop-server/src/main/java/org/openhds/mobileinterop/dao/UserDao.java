@@ -12,6 +12,9 @@ public interface UserDao {
 
 	@Transactional
 	public boolean saveUser(User user, String roleName);
+	
+	@Transactional
+	public boolean updateUser(User user);
 
 	@Transactional(readOnly = true)
 	public User findUserById(String previousOwner);

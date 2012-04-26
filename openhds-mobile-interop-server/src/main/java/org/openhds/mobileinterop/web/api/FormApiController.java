@@ -38,20 +38,18 @@ public class FormApiController {
 	public void handleFormSubmission(@RequestBody FormSubmission submission, HttpServletResponse response) {
 		// any form that does not have a registered user is automatically
 		// funneled to admin user
-		String previousOwner = submission.getFormOwnerId().toUpperCase();
-		User user = userDao.findUserById(previousOwner);
-		if (user == null) {
-			previousOwner = "admin";
-		}
-		submission.setFormOwnerId(previousOwner);
+//		String previousOwner = submission.getFormOwnerId().toUpperCase();
+//		User user = userDao.findUserById(previousOwner);
+//		if (user == null) {
+//			previousOwner = "admin";
+//		}
+		//submission.setFormOwnerId(previousOwner);
 		dao.saveFormSubmission(submission);
 	}
 	
-	@RequestMapping(value = "/fixed", method = RequestMethod.POST)
-	public void setFormSubmissionToFixed(@RequestBody String uri, HttpServletResponse response) {
-		if (uri != null) {
-			dao.updateFormToFixed(uri);
-		}
+	@RequestMapping(value = "/complete", method = RequestMethod.POST)
+	public void setFormSubmissionToFixed(@RequestBody FormSubmission submission, HttpServletResponse response) {
+		dao.completeFormSubmissionGroup(submission);
 		
 		response.setStatus(HttpServletResponse.SC_OK);
 		try {
@@ -63,9 +61,9 @@ public class FormApiController {
 	public ResponseEntity<FormSubmissionSet> getFormInstancesForUser() {
 		SecurityContext context = SecurityContextHolder.getContext();
 		Authentication auth = context.getAuthentication();
-		String user = auth.getName();
-
-		List<FormSubmission> submissions = dao.findSubmissionsByOwner(user);
+		String username = auth.getName();
+		User user = userDao.findUserById(username);
+		List<FormSubmission> submissions = dao.findDownloadableSubmissionsForUser(user);
 		if (submissions.size() == 0) {
 			return new ResponseEntity<FormSubmissionSet>(HttpStatus.NO_CONTENT);
 		}

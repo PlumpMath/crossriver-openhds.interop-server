@@ -15,7 +15,7 @@ public class Authority implements Serializable {
 	@EmbeddedId
 	AuthorityPK authorityPK;
 	
-	public static final String FIELD_WORKER = "ROLE_FIELDWORKER";
+	public static final String SUPERVISOR = "ROLE_SUPERVISOR";
 	public static final String ADMIN = "ROLE_ADMIN";
 
 	public AuthorityPK getAuthorityPK() {

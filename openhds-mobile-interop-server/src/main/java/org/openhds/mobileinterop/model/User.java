@@ -1,6 +1,10 @@
 package org.openhds.mobileinterop.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -22,6 +26,9 @@ public class User {
 	private String password;
 	
 	private boolean enabled;
+	
+	@ElementCollection
+	private Set<String> managedFieldworkers = new HashSet<String>();
 
 	public long getId() {
 		return id;
@@ -65,5 +72,13 @@ public class User {
 	
 	public boolean passwordMatch(String matchPassword) {
 		return password.equals(matchPassword);		
+	}
+
+	public Set<String> getManagedFieldworkers() {
+		return managedFieldworkers;
+	}
+
+	public void setManagedFieldworkers(Set<String> managedFieldworkers) {
+		this.managedFieldworkers = managedFieldworkers;
 	}
 }

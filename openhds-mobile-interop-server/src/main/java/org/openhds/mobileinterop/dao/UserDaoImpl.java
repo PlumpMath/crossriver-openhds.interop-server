@@ -8,6 +8,7 @@ import org.hibernate.criterion.Restrictions;
 import org.openhds.mobileinterop.model.Authority;
 import org.openhds.mobileinterop.model.AuthorityPK;
 import org.openhds.mobileinterop.model.User;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -34,11 +35,6 @@ public class UserDaoImpl implements UserDao {
 
 	@Override
 	public boolean saveUser(User user, String roleName) {
-		User previousUser = findUserById(user.getUsername());
-		if (previousUser != null) {
-			return false;
-		}
-		
 		user.setEnabled(true);
 		getCurrentSession().save(user);
 
@@ -59,4 +55,18 @@ public class UserDaoImpl implements UserDao {
 		return (User) getCurrentSession().createCriteria(User.class)
 				.add(Restrictions.eq("username", previousOwner)).uniqueResult();
 	}
+
+	@Override
+	public boolean updateUser(User user) {
+		User savedUser = findUserById(user.getUsername());
+		if (savedUser == null) {
+			return false;
+		}
+		
+		savedUser.setUsername(user.getUsername());
+		savedUser.setPassword(user.getPassword());
+		
+		return true;
+	}
+
 }

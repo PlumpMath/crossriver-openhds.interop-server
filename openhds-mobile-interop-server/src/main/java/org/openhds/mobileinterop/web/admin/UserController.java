@@ -2,6 +2,7 @@ package org.openhds.mobileinterop.web.admin;
 
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.openhds.mobileinterop.dao.UserDao;
 import org.openhds.mobileinterop.model.Authority;
 import org.openhds.mobileinterop.model.User;
@@ -18,7 +19,7 @@ import org.springframework.web.servlet.ModelAndView;
  * Handles administrative tasks relating to the users of the interop servers
  */
 @Controller
-@RequestMapping(value = "/admin/users", method = RequestMethod.GET)
+@RequestMapping(value = "/admin/users")
 public class UserController extends AbstractUserController {
 
 	private UserDao dao;
@@ -55,8 +56,15 @@ public class UserController extends AbstractUserController {
 			errors.add("Already a user registered with that username");
 			return showCreatePageWithErrors(errors, user);
 		}
+		
+		List<String> supervisedFws = formValues.get("supervisedFieldworker");
+		for(String fw : supervisedFws) {
+			if (StringUtils.isNotBlank(fw)) {
+				user.getManagedFieldworkers().add(fw);
+			}
+		}
 
-		dao.saveUser(user, Authority.FIELD_WORKER);
+		dao.saveUser(user, Authority.SUPERVISOR);
 		ModelAndView mv = new ModelAndView();
 		mv.setViewName("redirect:/admin/users/");
 		return mv;

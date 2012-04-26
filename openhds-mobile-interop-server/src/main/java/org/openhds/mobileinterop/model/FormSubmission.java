@@ -3,21 +3,20 @@ package org.openhds.mobileinterop.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlEnum;
-import javax.xml.bind.annotation.XmlEnumValue;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+
 
 /**
  * Represents a form submission from a mobile device
@@ -30,7 +29,7 @@ public class FormSubmission {
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private long id;
 	
-	@OneToMany(mappedBy="submission")
+	@OneToMany(cascade={CascadeType.ALL}, mappedBy="submission")
 	private Set<FormError> formErrors = new HashSet<FormError>();
 	
 	private String formType;
@@ -48,32 +47,11 @@ public class FormSubmission {
 	@Column(nullable=false)
 	private String formInstanceXml;
 	
-	@Enumerated(EnumType.STRING)
-	private SubmissionStatus submissionStatus = SubmissionStatus.SUBMITTED;
+	@ManyToOne
+	private FormSubmissionGroup group;
 	
-	@XmlEnum
-	public enum SubmissionStatus {
-		@XmlEnumValue("submitted")
-		SUBMITTED("submitted"),
-		
-		@XmlEnumValue("downloaded")
-		DOWNLOADED("downloaded"),
-		
-		@XmlEnumValue("fixed")
-		FIXED("fixed");
-		
-		private final String status;
-		
-		private SubmissionStatus(String status) {
-			this.status = status;
-		}
-		
-		@Override
-		public String toString() {
-			return status;
-		}
-	}
-
+	private boolean active = true;
+	
 	public long getId() {
 		return id;
 	}
@@ -116,15 +94,6 @@ public class FormSubmission {
 		this.formOwnerId = formOwnerId;
 	}
 
-	@XmlTransient
-	public SubmissionStatus getSubmissionStatus() {
-		return submissionStatus;
-	}
-
-	public void setSubmissionStatus(SubmissionStatus submissionStatus) {
-		this.submissionStatus = submissionStatus;
-	}
-	
 	public String getOdkUri() {
 		return odkUri;
 	}
@@ -152,7 +121,34 @@ public class FormSubmission {
 	@Override
 	public String toString() {
 		return "FormSubmission [id=" + id + ", formType=" + formType + 
-				", formOwnerId=" + formOwnerId + ", submissionStatus=" + submissionStatus +
+				", formOwnerId=" + formOwnerId + 
 				", errors=" + formErrors.toString() + "]";
 	}
+
+	public boolean hasDerivedUri() {
+		return derivedFromUri != null && !derivedFromUri.trim().isEmpty();
+	}
+
+	@XmlTransient
+	public FormSubmissionGroup getGroup() {
+		return group;
+	}
+
+	public void setGroup(FormSubmissionGroup group) {
+		this.group = group;
+	}
+
+	@XmlTransient
+	public boolean isActive() {
+		return active;
+	}
+
+	public void setActive(boolean active) {
+		this.active = active;
+	}
+
+	public void addDownloadActionToGroup() {
+		group.addDownloadAction(this);
+	}
+
 }

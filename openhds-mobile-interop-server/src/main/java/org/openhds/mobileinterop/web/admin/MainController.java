@@ -57,7 +57,7 @@ public class MainController extends AbstractUserController {
 	@RequestMapping(value = { "", "/" })
 	public ModelAndView index() {
 		if (!adminUserPresent) {
-			User admin = dao.findUserById("ADMIN");
+			User admin = dao.findUserById("admin");
 			if (admin == null) {
 				return new ModelAndView("adminCreate");
 			} else {

@@ -15,6 +15,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.openhds.mobileinterop.dao.FormDao;
 import org.openhds.mobileinterop.model.FormSubmission;
+import org.openhds.mobileinterop.model.FormSubmissionGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,12 +41,21 @@ public class FormAdminController {
 	public FormAdminController(FormDao dao) {
 		this.dao = dao;
 	}
+	
+	@RequestMapping(value = "/group/{groupId}")
+	public ModelAndView viewFormSubmission(@PathVariable long groupId) {
+		FormSubmissionGroup submissionGroup = dao.findFormSubmissionGroupById(groupId);
+		ModelAndView mv = new ModelAndView("viewSubmissionGroup");
+		mv.addObject("group", submissionGroup);
+		return mv;
+	}
 
-	@RequestMapping(value = "/{id}")
-	public ModelAndView viewFormSubmission(@PathVariable long id) {
-		FormSubmission submission = dao.findFormSubmissionById(id);
+	@RequestMapping(value = "/group/{groupId}/submission/{submissionId}")
+	public ModelAndView viewFormSubmission(@PathVariable long groupId, @PathVariable long submissionId) {
+		FormSubmission submission = dao.findFormSubmissionById(submissionId);
 		ModelAndView mv = new ModelAndView("viewSubmission");
 		mv.addObject("form", submission);
+		mv.addObject("group", groupId);
 		String prettyXml = prettyPrintXml(submission.getFormInstanceXml());
 		mv.addObject("instanceXml", HtmlUtils.htmlEscape(prettyXml));
 		return mv;

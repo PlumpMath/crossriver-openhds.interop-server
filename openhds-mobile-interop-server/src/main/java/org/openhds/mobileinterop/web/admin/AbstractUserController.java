@@ -11,7 +11,7 @@ public abstract class AbstractUserController {
 
 	protected User getUserFromSubmittedValues(MultiValueMap<String, String> formValues) {
 		User user = new User();
-		user.setUsername(formValues.getFirst("username").toUpperCase());
+		user.setUsername(formValues.getFirst("username"));
 		user.setPassword(formValues.getFirst("password"));
 		
 		return user;
