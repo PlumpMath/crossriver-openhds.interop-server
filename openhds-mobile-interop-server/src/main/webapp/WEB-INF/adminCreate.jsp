@@ -26,11 +26,12 @@
 					</ul>
 				</p>
 			</c:if>
-			<p>Password:<br />
+			<p><strong>Username</strong>: admin</p>
+			<p><strong>Password</strong>:<br />
 				<input type="password" size="50" name="password" />
 			</p>
 			
-			<p>Confirm Password:<br />
+			<p><strong>Confirm Password</strong>:<br />
 				<input type="password" size="50" name="confirmPassword" />
 			</p>
 		

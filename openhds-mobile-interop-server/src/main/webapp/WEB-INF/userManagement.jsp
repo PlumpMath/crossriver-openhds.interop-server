@@ -9,7 +9,7 @@
 	</head>
 	<body>
 		<h3>Manage Users</h3>
-		<p><a href="${pageContext.request.contextPath}/index.jsp">Home</a></p>
+		<p><a href="${pageContext.request.contextPath}/">Home</a></p>
 		<ul>
 			<li><a href="create">Add a new user</a></li>
 		</ul>
@@ -22,10 +22,14 @@
 			<table border=1>
 				<tr>
 					<th>Username</th>
+					<th>Edit</th>
+					<th>Delete</th>
 				</tr>
 				<c:forEach items="${userList}" var="user">
 					<tr>
 						<td>${user.username}</td>
+						<td><a href="edit/${user.username}">Edit User</a></td>
+						<td><a href="delete/${user.username}">Delete User</a></td>
 					</tr>
 				</c:forEach>
 			</table>
