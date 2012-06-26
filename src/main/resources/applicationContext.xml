@@ -44,7 +44,6 @@
   </bean>
   
   <bean id="formTypeConverter" class="org.openhds.mobileinterop.FormTypeConverter">
-    <constructor-arg value="${openhds.url}" />
     <constructor-arg>
       <map>
         <entry key="Birth" value="${birth.details}" />

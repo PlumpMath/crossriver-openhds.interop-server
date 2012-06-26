@@ -18,6 +18,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.openhds.mobileinterop.FormTypeConverter;
+import org.openhds.mobileinterop.dao.ApplicationSettingDao;
 import org.openhds.mobileinterop.dao.FormDao;
 import org.openhds.mobileinterop.model.FormGroup;
 import org.openhds.mobileinterop.model.FormSubmission;
@@ -45,11 +46,13 @@ public class FormAdminController {
 
 	private FormDao dao;
 	private FormTypeConverter converter;
+	private ApplicationSettingDao appSettingDao;
 
 	@Autowired
-	public FormAdminController(FormDao dao, FormTypeConverter converter) {
+	public FormAdminController(FormDao dao, FormTypeConverter converter, ApplicationSettingDao appSettingDao) {
 		this.dao = dao;
 		this.converter = converter;
+		this.appSettingDao = appSettingDao;
 	}
 
 	@RequestMapping(value = "/group/{groupId}")
@@ -60,7 +63,8 @@ public class FormAdminController {
 		if (submissionGroup.getCompletedFormId() != null) {
 			mv.addObject(
 					"openhdsUrl",
-					converter.getOpenHdsUrlForType(submissionGroup.getSubmissionGroupType(),
+					converter.getOpenHdsUrlForType(appSettingDao.readApplicationSetting("openhdsUrl", "http://openhds.rcg.usm.maine.edu/openhds"), 
+							submissionGroup.getSubmissionGroupType(),
 							submissionGroup.getCompletedFormId()));
 		}
 		
