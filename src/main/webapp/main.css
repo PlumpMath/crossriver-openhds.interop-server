@@ -1,0 +1,34 @@
+body {
+    background-color:#D8E8D8;
+}
+
+a {
+    color:#2E2EE6;
+    text-decoration:none;    
+}
+
+a:hover {
+    text-decoration:underline;    
+}
+
+.original {
+	background-color:#FF4D4D;
+	display:inline-block;
+	border:1px solid #000;
+	margin:0;
+}
+
+.revised {
+	background-color:#00CC00;
+	display:inline-block;
+	border:1px solid #000;
+	margin:0;
+}
+
+.revision {
+	border: 1px solid black;
+	padding: 1em;
+	display: inline-block;
+	background-color: #F9F9F6;
+}
+

@@ -1,0 +1,21 @@
+#set ($page_header = "View Form Submission")
+
+<p><a href="$request.getContextPath()/admin/form/group/$group">Back to Group</a><p>
+<p><strong>Form Id</strong>: $form.id</p>
+<p><strong>Form Type</strong>: $form.formType</p>
+<p><strong>ODK Aggregate Id</strong>: $form.odkUri</p>
+<p><strong>Form Owner Id</strong>: $form.formOwnerId</p>
+
+<div>
+	<strong>Form Errors</strong>:
+	<ul>
+		#foreach ($error in $form.formErrors)
+			<li>${error.error}</li>
+		#end
+	</ul>
+</div>
+
+<p><strong>Form Instance XML</strong>:</p>
+<pre>${instanceXml}</pre>
+<p><strong></strong></p>
+<p><strong></strong></p>

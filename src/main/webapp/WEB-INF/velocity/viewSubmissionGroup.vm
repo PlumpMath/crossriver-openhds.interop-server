@@ -1,0 +1,75 @@
+<p><a href="$request.getContextPath()/admin/form/list">Back to listing</a><p>
+
+<p><strong>Form Id</strong>: $group.id</p>
+<p><strong>Form Type</strong>: $group.submissionGroupType</p>
+#if ($group.completed)
+  #set ($status = "Finished")
+#else
+  #set ($status = "Ongoing")
+#end
+<p><strong>Status</strong>: $status</p>
+
+#if ($openhdsUrl)
+	<p><strong>OpenHDS URL</strong>: <a target="_BLANK" href="$openhdsUrl">$openhdsUrl</a></p>
+#end
+
+<div>
+	<strong>Form Submissions</strong>:
+	<ul>
+		#foreach ($sub in $group.submissions)
+			#if ($sub.active)
+				#set ($status = "Active")
+			#else
+				#set ($status = "Inactive")
+			#end
+			<li>Form Submission $sub.id <a href="$group.id/submission/$sub.id">View</a> ($status)</li>
+		#end
+	</ul>
+</div>
+
+
+<!-- The formatting is ugly because the page will render incorrectly with tabs -->
+#if ($revisions.size() > 0)
+<div>
+<strong>Changes to the form</strong>:<br />
+	<!-- for 1 -->
+#foreach ($revision in $revisions)
+<div class="revision">
+<div>Revision between $revision.first and $revision.second</div>
+		<!-- for 2 -->
+#foreach ($diff in $revision.diffs)
+					
+			<!-- for 3 -->
+<pre class="original">
+#foreach ($orig in $diff.originalLines)
+$orig
+#end
+</pre>
+			<!-- for 3 end -->
+<br />
+			<!-- for 3 -->
+<pre class="revised">
+#foreach ($change in $diff.revisedLines)
+$change
+#end		
+</pre>
+			<!-- for 3 end -->
+<br />
+#end
+		<!-- for 2 end -->
+</div>
+<br />
+#end
+	<!-- for 1 end -->
+<br />
+</div>
+#end
+
+<div>
+	<strong>Actions</strong>:
+	<ul>
+		#foreach ($action in $group.formActions)
+			<li>$action.actionType on $action.formattedDate&nbsp;(Form Submission $action.submission.id)</li>
+		#end
+	</ul>
+</div>

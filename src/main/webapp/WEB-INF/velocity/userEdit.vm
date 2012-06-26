@@ -1,0 +1,43 @@
+<form method="POST">
+	#if ($errors)
+		<p style="color:red">
+			Create user failed:
+			<ul>
+				#foreach ($error in $errors)
+					<li>$error</li>
+				#end
+			</ul>
+		</p>
+	#end
+	
+	<p>A form user can download a set of form submissions</p>
+	
+	
+	<p>User name:<br />
+		<input type="text" disabled="disabled" size="50" name="username" value="$!user.username" />
+	</p>
+	
+	<p>Password:<br />
+		<input type="password" size="50" name="password" />
+	</p>
+	<p>Confirm Password:<br />
+		<input type="password" size="50" name="confirmPassword" />
+	</p>
+	
+	<div><strong>Supervised Field Workers</strong>:<br />
+	  Enter 1 Field Worker Id per line. Blank fields will be ignored
+	  #foreach ($fw in $user.managedFieldworkers)
+	  	<div><input name="supervisedFieldworker" type="text" value="$fw" /></div>
+	  #end
+	  
+	  #set ($n = 6 - $user.managedFieldworkers.size())
+	  
+	  #if ($n > 0)
+		  #foreach ($a in [1..$n])
+		  	<div><input name="supervisedFieldworker" type="text" /></div>
+		  #end	  
+	  #end
+	</div>			
+	
+	<input type="submit" name="saveUser" value="Save" />
+</form>

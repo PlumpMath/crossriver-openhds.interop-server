@@ -1,0 +1,35 @@
+#set ($page_header = "Create a Form User")
+
+<form method="POST">
+	#if ($errors)
+		<p style="color:red">
+			Create user failed:
+			<ul>
+				#foreach ($error in $errors)
+					<li>${error}</li>
+				#end
+			</ul>
+		</p>
+	#end
+	
+	<p>A form user can download a set of form submissions</p>
+	
+	<p><strong>Username</strong>:<br /><input type="text" size="50" name="username" value="$!formUser.username" /></p>
+	
+	<p><strong>Password</strong>:<br />
+		<input type="password" size="50" name="password" />
+	</p>
+	<p><strong>Confirm Password</strong>:<br />
+		<input type="password" size="50" name="confirmPassword" />
+	</p>
+	<div><strong>Supervised Field Workers</strong>:<br />
+	  Enter 1 Field Worker Id per line. Blank fields will be ignored
+	  <div><input name="supervisedFieldworker" type="text" /></div>
+	  <div><input name="supervisedFieldworker" type="text" /></div>
+	  <div><input name="supervisedFieldworker" type="text" /></div>
+	  <div><input name="supervisedFieldworker" type="text" /></div>
+	  <div><input name="supervisedFieldworker" type="text" /></div>
+	  <div><input name="supervisedFieldworker" type="text" /></div>
+	</div>
+	<input type="submit" value="Create User" />
+</form>

@@ -1,0 +1,9 @@
+#set ($page_title = "Restart Application")
+#set ($page_header = "Restart the Application")
+
+<h3>Restart Application</h3>
+<p>
+  You have just made changes to the application that require a restart.
+  <br /><br />
+  Please restart the application
+</p>

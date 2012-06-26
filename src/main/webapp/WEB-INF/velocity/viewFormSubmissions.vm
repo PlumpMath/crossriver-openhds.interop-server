@@ -1,0 +1,24 @@
+#set ($page_header = "Form Groups")
+
+<table border=1 cellpadding=5>
+	<tr>
+		<th>Form Id</th>
+		<th>Form Type</th>
+		<th>Status</th>
+		<th># of Submission's</th>
+		<th>View</th>
+	</tr>
+	#foreach ($sub in $submissions)
+		<tr>
+			<td>$sub.id</td>
+			<td>$sub.submissionGroupType</td>
+			#if ($sub.completed)
+				<td>Finished</td>
+			#else
+				<td>Ongoing</td>
+			#end
+			<td>$sub.submissions.size()</td>
+			<td><a href="group/$sub.id">View Form Submission</a></td>
+		</tr>
+	#end
+</table>

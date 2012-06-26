@@ -1,0 +1,39 @@
+#set ($page_title = "Database Configuration")
+#set ($page_header = "Configure the Database")
+
+<form method="POST">	
+	#if ($errors)
+		<p style="color:red">
+			Create database failed:
+			<ul>
+				#foreach ($error in $errors)
+					<li>$error</li>
+				#end
+			</ul>
+		</p>
+	#end
+	
+	<p>Database:<br />
+		<select>
+			<option value="mysql">MySQL</option>
+		</select>
+	</p>
+	
+	<p>Database username:<br />
+		<input type="text" size="50" name="databaseUsername" value="$!databaseUsername" />
+	</p>
+	
+	<p>Database password:<br />
+		<input type="password" size="50" name="databasePassword" value="$!databasePassword" />
+	</p>
+	
+	<p>Database name:<br />
+		<input type="text" size="50" name="databaseName" value="$!databaseName" />
+	</p>
+	<p>
+	 <label><input type="checkbox" name="createDatabase" /> Create a fresh database</label>
+	 <br />
+	 <span style="color:red">NOTE: If this is checked, it will delete all existing data</span> 
+	</p>
+	<input type="submit" name="databaseCreate" value="Save Database Configuration" />
+</form>

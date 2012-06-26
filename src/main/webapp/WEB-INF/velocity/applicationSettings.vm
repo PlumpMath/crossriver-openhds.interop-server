@@ -1,0 +1,38 @@
+#set ($page_header = "Configure Application Settings")
+
+<form method="POST">
+  <fieldset>
+    <legend>OpenHDS Settings</legend>
+    <p>
+      <strong>OpenHDS Url</strong>:<br />
+      <input type="text" name="openhdsUrl" value="$!openhds.get('openhdsUrl')" size="50" />
+    </p>
+    <p>
+      <strong>Visit Amendment Details Url</strong>:<br />
+      <input type="text" name="visitUrl" size="50" value="$!openhds.get('visitUrl')" />
+    </p>
+    <p>
+      <strong>Death Amendment Details Url</strong>:<br />
+      <input type="text" name="deathUrl" size="50" value="$!openhds.get('deathUrl')" />
+    </p>
+    <p>
+      <strong>In Migration Amendment Details Url</strong>:<br />
+      <input type="text" name="inmigrationUrl" size="50" value="$!openhds.get('inmigrationUrl')" />
+    </p>
+    <p>
+      <strong>Out Migration Amendment Details Url</strong>:<br />
+      <input type="text" name="outmigrationUrl" size="50" value="$!openhds.get('outmigrationUrl')" />
+    </p>
+    <p>
+      <strong>Pregnancy Amendment Details Url</strong>:<br />
+      <input type="text" name="pregnancyUrl" size="50" value="$!openhds.get('pregnancyUrl')" />
+    </p>
+    <p>
+      <strong>Birth Amendment Details Url</strong>:<br />
+      <input type="text" name="birthUrl" size="50" value="$!openhds.get('birthUrl')" />
+    </p>
+    <p>
+      <input type="submit" name="openhds" value="Save OpenHDS Settings" />
+    </p>
+  </fieldset>
+</form>

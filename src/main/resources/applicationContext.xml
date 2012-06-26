@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+  xsi:schemaLocation=" http://www.springframework.org/schema/beans 
+                       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                       http://www.springframework.org/schema/context
+                       http://www.springframework.org/schema/context/spring-context-3.0.xsd
+                       http://www.springframework.org/schema/tx
+                       http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+
+  <import resource="classpath:securityContext.xml"/>
+
+  <context:annotation-config />
+
+  <context:component-scan base-package="org.openhds.mobileinterop">
+    <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller" />
+  </context:component-scan>
+
+  <tx:annotation-driven />
+
+  <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+    <constructor-arg ref="sessionFactory" />
+  </bean>
+  
+  <context:property-placeholder location="classpath:database.properties, classpath:openhds.properties" />
+
+  <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+    <property name="driverClassName" value="${database.jdbc.driver}" />
+    <property name="url" value="${database.jdbc.url}" />
+    <property name="username" value="${database.username}" />
+    <property name="password" value="${database.password}" />
+    <property name="validationQuery" value="SELECT 1" />
+    <property name="testOnBorrow" value="true" />
+  </bean>
+
+  <bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+    <property name="dataSource" ref="dataSource" />
+    <property name="packagesToScan" value="org.openhds.mobileinterop.model" />
+    <property name="hibernateProperties">
+      <props>
+        <prop key="hibernate.hbm2ddl.auto">${database.hbm2ddl}</prop>
+      </props>
+    </property>
+  </bean>
+  
+  <bean id="formTypeConverter" class="org.openhds.mobileinterop.FormTypeConverter">
+    <constructor-arg value="${openhds.url}" />
+    <constructor-arg>
+      <map>
+        <entry key="Birth" value="${birth.details}" />
+        <entry key="Death" value="${death.details}" />
+        <entry key="In Migration" value="${inmigration.details}" />
+        <entry key="Out Migration" value="${outmigration.details}" />
+        <entry key="Pregnancy" value="${pregnancy.details}" />
+        <entry key="Visit" value="${visit.details}" />
+      </map>
+    </constructor-arg>
+  </bean>
+
+</beans>

@@ -1,0 +1,15 @@
+#set ($page_header = "Mobile Interop Administration")
+
+#if ($needDatabaseConfiguration)
+	<div style="background-color:#FFFFCC">
+	  <strong>You are currently using the in-memory database. This means you could lose data. Please use 'Database Configuration' to configure database properties.
+	</div>
+#end
+	
+<ul>
+	<li><a href="admin/users/">Manage Server Users</a></li>
+	<li><a href="admin/form/list">View Form Submissions</a></li>
+	<li><a href="admin/database-configuration">Database Configuration</a></li>
+	<li><a href="admin/application-settings">Application Settings</a></li>
+</ul>
+

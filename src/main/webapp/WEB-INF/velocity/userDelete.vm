@@ -1,0 +1,10 @@
+#set ($page_header = "Mobile Interop Administration")
+
+<form method="POST">
+	<h3>Delete User</h3>
+	<p style="color:red">
+		Are you sure you want to delete the user $username?
+	</p>
+	<input type="submit" name="delete" value="Delete User" />
+	<input type="submit" name="cancel" value="Cancel" />
+</form>
