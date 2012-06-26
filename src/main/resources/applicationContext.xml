@@ -52,6 +52,8 @@
         <entry key="Out Migration" value="${outmigration.details}" />
         <entry key="Pregnancy" value="${pregnancy.details}" />
         <entry key="Visit" value="${visit.details}" />
+        <entry key="House" value="${location.details}" />
+        <entry key="Household" value="${socialgroup.details}" />
       </map>
     </constructor-arg>
   </bean>
