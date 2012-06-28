@@ -83,6 +83,9 @@ public class FormAdminController {
 	public ModelAndView updateSubmissionGroup(@PathVariable long groupId, @RequestBody MultiValueMap<String, String> formValues) {
 		if (StringUtils.isNotEmpty(formValues.getFirst("voided"))) {
 			dao.voidGroup(groupId);
+		} else if (StringUtils.isNotEmpty(formValues.getFirst("deleted"))) {
+			dao.deleteGroup(groupId);
+			return new ModelAndView("redirect:/admin");
 		}
 		return buildSubmissionGroupView(groupId);
 	}

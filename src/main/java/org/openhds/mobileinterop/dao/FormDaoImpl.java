@@ -121,4 +121,11 @@ public class FormDaoImpl implements FormDao {
 		FormSubmission submission = findFormSubmissionById(submissionId);
 		submission.setFormOwnerId(owner);
 	}
+
+	@Override
+	@Transactional
+	public void deleteGroup(long groupId) {
+		FormGroup group = findFormSubmissionGroupById(groupId);
+		getCurrentSession().delete(group);
+	}
 }

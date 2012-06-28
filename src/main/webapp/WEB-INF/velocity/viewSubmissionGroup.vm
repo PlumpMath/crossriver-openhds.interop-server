@@ -9,6 +9,28 @@
 #end
 <p><strong>Status</strong>: $status</p>
 
+#if ($group.completed)
+  <p>
+    <form method="POST">
+      <label>
+        <input type="checkbox" name="deleteGroup" id="deleteGroup" /> 
+        Do you want to delete this form group?<br />
+      </label>
+      (Deleting the group will erase all data from the database)<br />
+      <input type="submit" name="deleted" id="deleted" value="Delete Group" disabled="disabled" />
+    </form>
+  </p>
+  <script type="text/javascript">
+    $("#deleteGroup").click(function(evt) {
+      if (this.checked === false || $(this).attr("checked") === undefined) {
+        $("#deleted").attr("disabled", "disabled");
+      } else {
+        $("#deleted").removeAttr("disabled");
+      }
+    });
+  </script>
+#end
+
 #if (!$group.completed)
   <p>
     <form method="POST">
