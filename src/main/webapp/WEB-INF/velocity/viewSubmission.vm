@@ -4,7 +4,13 @@
 <p><strong>Form Id</strong>: $form.id</p>
 <p><strong>Form Type</strong>: $form.formType</p>
 <p><strong>ODK Aggregate Id</strong>: $form.odkUri</p>
-<p><strong>Form Owner Id</strong>: $form.formOwnerId</p>
+<p>
+  <form method="POST">
+    <strong>Form Owner Id</strong>:<br />
+    <input type="text" name="formOwnerId" value="$form.formOwnerId" size="20"/><br />
+    <input type="submit" value="Change Form Owner Id" />
+  </form>
+</p>
 
 <div>
 	<strong>Form Errors</strong>:

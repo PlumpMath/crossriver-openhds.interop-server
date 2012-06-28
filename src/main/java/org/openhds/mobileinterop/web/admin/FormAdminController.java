@@ -147,7 +147,14 @@ public class FormAdminController {
 		return mv;
 	}
 
-
+	@RequestMapping(value = "/group/{groupId}/submission/{submissionId}", method=RequestMethod.POST)
+	public ModelAndView updateFormSubmission(@PathVariable long groupId, @PathVariable long submissionId, @RequestBody MultiValueMap<String, String> formValues) {
+		if (StringUtils.isNotEmpty(formValues.getFirst("formOwnerId"))) {
+			dao.updateOwnerIdForSubmission(submissionId, formValues.getFirst("formOwnerId"));
+		}
+		
+		return viewFormSubmission(groupId, submissionId);
+	}
 
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
 	public ModelAndView getFormSubmissionList() {

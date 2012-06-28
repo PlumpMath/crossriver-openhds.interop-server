@@ -22,4 +22,6 @@ public interface FormDao {
 	public void completeFormSubmissionGroup(String completedFormId, FormSubmission submission);
 
 	public void voidGroup(long groupId);
+
+	public void updateOwnerIdForSubmission(long submissionId, String owner);
 }
