@@ -7,5 +7,8 @@
       <strong>OpenHDS Url</strong>:<br />
       <input type="text" name="openhdsUrl" value="$!openhds.get('openhdsUrl')" size="50" />
     </p>
+    <p>
+      <input type="submit" name="openhds" value="Save OpenHDS Settings" />    
+    </p>
   </fieldset>
 </form>
