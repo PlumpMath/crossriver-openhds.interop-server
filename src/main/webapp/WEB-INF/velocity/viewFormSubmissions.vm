@@ -1,24 +1,69 @@
 #set ($page_header = "Form Groups")
 
-<table border=1 cellpadding=5>
-	<tr>
-		<th>Form Id</th>
-		<th>Form Type</th>
-		<th>Status</th>
-		<th># of Submission's</th>
-		<th>View</th>
-	</tr>
-	#foreach ($sub in $submissions)
-		<tr>
-			<td>$sub.id</td>
-			<td>$sub.submissionGroupType</td>
-			#if ($sub.completed)
-				<td>Finished</td>
-			#else
-				<td>Ongoing</td>
-			#end
-			<td>$sub.submissions.size()</td>
-			<td><a href="group/$sub.id">View Form Submission</a></td>
-		</tr>
-	#end
-</table>
+<div>
+  <strong>Filtering</strong><br />
+  <table border=0 cellspacing=0>
+    <tr>
+      <td>Form Type:</td>
+      <td>
+        <select name="formTypeFilter">
+          <option value="none">None</option>
+          <option value="house">House</option>
+          <option value="household>Household</option>
+          <option value="visit">Visit</option>
+          <option value="birth">Birth</option>
+          <option value="death">Death</option>
+          <option value="inmigration">In Migration</option>
+          <option value="outmigration">Out Migration</option>
+          <option value="pregnancyobs">Pregnancy Observation</option>
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td>Status:</td> 
+      <td>
+        <select name="statusFilter">
+          <option value="none">None</option>
+          <option value="finish">Finished</option>
+          <option value="ongoing">Ongoing</option>
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td>Workflow State:</td>
+      <td>
+        <select name="supervisorFilter">
+          <option value="none">None</option>
+          <option value="review">Needs Supervisor Review</option>
+          <option value="errors">Failed with submission errors</option>
+        </select>
+      </tr>
+    </tr>
+  </table>
+  <input type="submit" value="Filter" />
+</div>
+
+<p>
+  <table border=1 cellpadding=5>
+  	<tr>
+  		<th>Form Id</th>
+  		<th>Form Type</th>
+  		<th>Status</th>
+  		<th># of Submission's</th>
+  		<th>View</th>
+  	</tr>
+  	#foreach ($sub in $submissions)
+  		<tr>
+  			<td>$sub.id</td>
+  			<td>$sub.submissionGroupType</td>
+  			#if ($sub.completed)
+  				<td>Finished</td>
+  			#else
+  				<td>Ongoing</td>
+  			#end
+  			<td>$sub.submissions.size()</td>
+  			<td><a href="group/$sub.id">View Form Submission</a></td>
+  		</tr>
+  	#end
+  </table>
+</p>

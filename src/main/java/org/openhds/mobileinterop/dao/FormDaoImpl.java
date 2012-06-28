@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.openhds.mobileinterop.model.FormError;
 import org.openhds.mobileinterop.model.FormSubmission;
@@ -127,5 +128,11 @@ public class FormDaoImpl implements FormDao {
 	public void deleteGroup(long groupId) {
 		FormGroup group = findFormSubmissionGroupById(groupId);
 		getCurrentSession().delete(group);
+	}
+
+	@Override
+	public long getTotalFormGroupCount() {
+		Integer count = (Integer)getCurrentSession().createCriteria(FormGroup.class).setProjection(Projections.rowCount()).uniqueResult();
+		return count;
 	}
 }

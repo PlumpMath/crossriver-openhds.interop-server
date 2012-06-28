@@ -45,6 +45,8 @@ import difflib.Patch;
 @Controller
 @RequestMapping("/admin/form")
 public class FormAdminController {
+	private static final int PAGE_SIZE = 50;
+
 	private final static Logger logger = LoggerFactory.getLogger(FormAdminController.class);
 
 	private FormDao dao;
@@ -80,7 +82,7 @@ public class FormAdminController {
 	}
 	
 	@RequestMapping(value = "/group/{groupId}", method=RequestMethod.POST)
-	public ModelAndView updateSubmissionGroup(@PathVariable long groupId, @RequestBody MultiValueMap<String, String> formValues) {
+	public ModelAndView updateSubmissionGroup(@PathVariable() long groupId, @RequestBody MultiValueMap<String, String> formValues) {
 		if (StringUtils.isNotEmpty(formValues.getFirst("voided"))) {
 			dao.voidGroup(groupId);
 		} else if (StringUtils.isNotEmpty(formValues.getFirst("deleted"))) {
@@ -159,11 +161,41 @@ public class FormAdminController {
 		return viewFormSubmission(groupId, submissionId);
 	}
 
-	@RequestMapping(value = "/list", method = RequestMethod.GET)
-	public ModelAndView getFormSubmissionList() {
+	@RequestMapping(value = {"/list", "/list/"}, method = RequestMethod.GET)
+	public ModelAndView redirectToSubmissionList() {
+		return new ModelAndView("redirect:/admin/list/1");
+	}
+	
+	@RequestMapping(value = "/list/{pageNumber}", method = RequestMethod.GET)
+	public ModelAndView getFormSubmissionList(@PathVariable("pageNumber") long pageNumber) {
+		if (!isPageInRange(pageNumber)) {
+			return new ModelAndView("redirect:/admin/list/1");
+		}
 		ModelAndView mv = new ModelAndView("viewFormSubmissions");
 		mv.addObject("submissions", dao.findAllFormSubmissions(50));
 		return mv;
+	}
+
+	private boolean isPageInRange(long pageNumber) {
+		if (pageNumber < 1) {
+			return false;
+		}
+		
+		long endRowIndex = endRowFromPageNumber(pageNumber);
+		long totalCount = dao.getTotalFormGroupCount();
+		if (endRowIndex <= totalCount - 1) {
+			return true;
+		}
+
+		return false;
+	}
+
+	private long startRowFromPageNumber(long pageNumber) {
+		return (pageNumber - 1) * PAGE_SIZE;
+	}
+	
+	private long endRowFromPageNumber(long pageNumber) {
+		return (pageNumber * PAGE_SIZE) - 1;
 	}
 
 	public String prettyPrintXml(String xml) {

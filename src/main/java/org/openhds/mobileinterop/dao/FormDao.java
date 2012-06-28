@@ -26,4 +26,6 @@ public interface FormDao {
 	public void updateOwnerIdForSubmission(long submissionId, String owner);
 
 	public void deleteGroup(long groupId);
+
+	public long getTotalFormGroupCount();
 }
