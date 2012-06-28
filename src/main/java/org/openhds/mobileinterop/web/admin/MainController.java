@@ -41,7 +41,8 @@ public class MainController extends AbstractUserController {
 
 	private static final String DATABASE_PASSWORD_PROP = "database.password";
 	private static final String DATABASE_USER_PROP = "database.username";
-	private static final String DATABASE_NAME_PROP = "database.jdbc.url";
+	private static final String DATABASE_NAME_PROP = "database.name";
+	private static final String DATABASE_JDBC_PROP = "database.jdbc.url";
 	private static final String DATABASE_PROPERTIES_FILE = "database.properties";
 	private static final String MYSQL_HIBERNATE_DIALECT = "org.hibernate.dialect.MySQL5InnoDBDialect";
 	private static final String MYSQL_DRIVER_CLASS = "com.mysql.jdbc.Driver";
@@ -194,7 +195,8 @@ public class MainController extends AbstractUserController {
 			File properties = resouce.getFile();
 			FileOutputStream stream = new FileOutputStream(properties);
 			Properties propFile = new Properties();
-			propFile.put(DATABASE_NAME_PROP,
+			propFile.put(DATABASE_NAME_PROP, dbCreds.getDatabaseName());
+			propFile.put(DATABASE_JDBC_PROP,
 					getMysqlJdbcUrlFromName(dbCreds.getDatabaseName()));
 			propFile.put(DATABASE_USER_PROP, dbCreds.getDatabaseUsername());
 			propFile.put(DATABASE_PASSWORD_PROP, dbCreds.getDatabasePassword());
