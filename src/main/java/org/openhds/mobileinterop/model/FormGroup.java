@@ -165,4 +165,13 @@ public class FormGroup {
 		return null;
 	}
 
+	public void voidGroup() {
+		completed = true;
+		for(FormSubmission submission : getSubmissions()) {
+			if (submission.isActive()) {
+				submission.setActive(false);
+				break;
+			}
+		}		
+	}
 }

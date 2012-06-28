@@ -9,6 +9,15 @@
 #end
 <p><strong>Status</strong>: $status</p>
 
+#if (!$group.completed)
+  <p>
+    <form method="POST">
+      <input type="submit" name="voided" value="Void Group" /><br />
+      Voiding a group will not allow the form to be downloaded by a supervisor
+    </form>
+  </p>
+#end
+
 #if ($openhdsUrl)
 	<p><strong>OpenHDS URL</strong>: <a target="_BLANK" href="$openhdsUrl">$openhdsUrl</a></p>
 #end

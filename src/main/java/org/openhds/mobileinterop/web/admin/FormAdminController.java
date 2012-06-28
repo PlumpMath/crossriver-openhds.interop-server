@@ -17,6 +17,7 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.commons.lang.StringUtils;
 import org.openhds.mobileinterop.FormTypeConverter;
 import org.openhds.mobileinterop.dao.ApplicationSettingDao;
 import org.openhds.mobileinterop.dao.FormDao;
@@ -26,7 +27,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
@@ -57,6 +60,10 @@ public class FormAdminController {
 
 	@RequestMapping(value = "/group/{groupId}")
 	public ModelAndView viewFormSubmission(@PathVariable long groupId) {
+		return buildSubmissionGroupView(groupId);
+	}
+
+	private ModelAndView buildSubmissionGroupView(long groupId) {
 		FormGroup submissionGroup = dao.findFormSubmissionGroupById(groupId);
 		ModelAndView mv = new ModelAndView("viewSubmissionGroup");
 		mv.addObject("group", submissionGroup);
@@ -70,6 +77,14 @@ public class FormAdminController {
 		
 		mv.addObject("revisions", calculateDiffs(submissionGroup));
 		return mv;
+	}
+	
+	@RequestMapping(value = "/group/{groupId}", method=RequestMethod.POST)
+	public ModelAndView updateSubmissionGroup(@PathVariable long groupId, @RequestBody MultiValueMap<String, String> formValues) {
+		if (StringUtils.isNotEmpty(formValues.getFirst("voided"))) {
+			dao.voidGroup(groupId);
+		}
+		return buildSubmissionGroupView(groupId);
 	}
 
 	private List<Revision> calculateDiffs(FormGroup group) {
