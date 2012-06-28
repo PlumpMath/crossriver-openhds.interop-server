@@ -12,10 +12,23 @@
 #if (!$group.completed)
   <p>
     <form method="POST">
-      <input type="submit" name="voided" value="Void Group" /><br />
-      Voiding a group will not allow the form to be downloaded by a supervisor
+      <label>
+        <input type="checkbox" name="acceptVoid" id="acceptVoid" /> 
+        Do you want to void this form?<br />
+      </label>
+      (Voiding a group will not allow the form to be downloaded by a supervisor)<br />
+      <input type="submit" name="voided" id="voided" value="Void Group" disabled="disabled" />
     </form>
   </p>
+  <script type="text/javascript">
+    $("#acceptVoid").click(function(evt) {
+      if (this.checked === false || $(this).attr("checked") === undefined) {
+        $("#voided").attr("disabled", "disabled");
+      } else {
+        $("#voided").removeAttr("disabled");
+      }
+    });
+  </script>
 #end
 
 #if ($openhdsUrl)

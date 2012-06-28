@@ -91,9 +91,13 @@ public class FormGroup {
 	}
 
 	public void addUploadAction(FormSubmission submission) {
+		addAction(submission, ActionType.UPLOADED);
+	}
+	
+	private void addAction(FormSubmission submission, ActionType actionEvent) {
 		FormAction action = new FormAction();
 		action.setActionTime(Calendar.getInstance());
-		action.setActionType(ActionType.UPLOADED);
+		action.setActionType(actionEvent);
 		action.setSubmissionGroup(this);
 		action.setSubmission(submission);
 		formActions.add(action);
@@ -116,21 +120,11 @@ public class FormGroup {
 	}
 
 	private void addCompleteAction(FormSubmission submission) {
-		FormAction action = new FormAction();
-		action.setActionTime(Calendar.getInstance());
-		action.setActionType(ActionType.COMPLETED);
-		action.setSubmissionGroup(this);
-		action.setSubmission(submission);
-		formActions.add(action);
+		addAction(submission, ActionType.COMPLETED);
 	}
 
 	public void addDownloadAction(FormSubmission formSubmission) {
-		FormAction action = new FormAction();
-		action.setActionTime(Calendar.getInstance());
-		action.setActionType(ActionType.DOWNLOADED);
-		action.setSubmissionGroup(this);
-		action.setSubmission(formSubmission);
-		formActions.add(action);
+		addAction(formSubmission, ActionType.DOWNLOADED);
 	}
 
 	public String getCompletedFormId() {
@@ -170,8 +164,9 @@ public class FormGroup {
 		for(FormSubmission submission : getSubmissions()) {
 			if (submission.isActive()) {
 				submission.setActive(false);
+				addAction(submission, ActionType.VOIDED);
 				break;
 			}
-		}		
+		}
 	}
 }

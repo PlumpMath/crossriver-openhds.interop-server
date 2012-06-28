@@ -35,7 +35,7 @@ public class FormAction {
 	private static SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 	
 	public enum ActionType {
-		UPLOADED("Uploaded"), DOWNLOADED("Downloaded"), COMPLETED("Completed");
+		UPLOADED("Uploaded"), DOWNLOADED("Downloaded"), COMPLETED("Completed"), VOIDED("Voided");
 		
 		private final String status;
 		
