@@ -48,14 +48,4 @@ public class FormGroupTest {
 		assertFalse(fs1.isActive());
 		assertFalse(fs2.isActive());
 	}
-	
-	@Test
-	public void shouldAddCompleteAction() {
-		FormSubmission fs1 = new FormSubmission();
-		group.completeFormSubmissionGroup(fs1);
-		
-		FormAction[] actions = group.getFormActions().toArray(new FormAction[]{});
-		assertEquals(2, actions.length);
-		assertEquals(FormAction.ActionType.COMPLETED, actions[1].getActionType());
-	}
 }
