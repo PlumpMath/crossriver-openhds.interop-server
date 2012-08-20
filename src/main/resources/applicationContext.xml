@@ -54,6 +54,7 @@
         <entry key="Visit" value="${visit.details}" />
         <entry key="House" value="${location.details}" />
         <entry key="Household" value="${socialgroup.details}" />
+        <entry key="Vaccination" value="${vaccination.details}" />
       </map>
     </constructor-arg>
   </bean>
