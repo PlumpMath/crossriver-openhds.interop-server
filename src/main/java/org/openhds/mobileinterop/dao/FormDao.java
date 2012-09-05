@@ -13,7 +13,7 @@ public interface FormDao {
 
 	public List<FormSubmission> findDownloadableSubmissionsForUser(User user);
 
-	public List<FormGroup> findAllFormSubmissions(int pageSize);
+	public List<FormGroup> findAllFormSubmissions(int startItem, int pageSize);
 
 	public FormSubmission findFormSubmissionById(long id);
 
@@ -26,4 +26,6 @@ public interface FormDao {
 	public void updateOwnerIdForSubmission(long submissionId, String owner);
 
 	public void deleteGroup(long groupId);
+	
+	long getFormGroupCount();
 }

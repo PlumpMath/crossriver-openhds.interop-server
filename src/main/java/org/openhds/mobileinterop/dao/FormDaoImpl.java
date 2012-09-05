@@ -3,12 +3,15 @@ package org.openhds.mobileinterop.dao;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.openhds.mobileinterop.model.FormError;
-import org.openhds.mobileinterop.model.FormSubmission;
 import org.openhds.mobileinterop.model.FormGroup;
+import org.openhds.mobileinterop.model.FormSubmission;
 import org.openhds.mobileinterop.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,8 +53,7 @@ public class FormDaoImpl implements FormDao {
 	}
 
 	private FormSubmission findDerivedSubmission(FormSubmission submission) {
-		FormSubmission dervivedSubmission = (FormSubmission) getCurrentSession()
-				.createCriteria(FormSubmission.class)
+		FormSubmission dervivedSubmission = (FormSubmission) getCurrentSession().createCriteria(FormSubmission.class)
 				.add(Restrictions.eq("odkUri", submission.getDerivedFromUri())).uniqueResult();
 		return dervivedSubmission;
 	}
@@ -67,23 +69,24 @@ public class FormDaoImpl implements FormDao {
 	@SuppressWarnings("unchecked")
 	@Transactional
 	public List<FormSubmission> findDownloadableSubmissionsForUser(User user) {
-		List<FormSubmission> subs =  (List<FormSubmission>) getCurrentSession().createCriteria(FormSubmission.class)
+		List<FormSubmission> subs = (List<FormSubmission>) getCurrentSession().createCriteria(FormSubmission.class)
 				.add(Restrictions.in("formOwnerId", user.getManagedFieldworkers()))
-				.add(Restrictions.eq("active", true)).list();	
-		
-		for(FormSubmission sub : subs) {
+				.add(Restrictions.eq("active", true)).list();
+
+		for (FormSubmission sub : subs) {
 			sub.addDownloadActionToGroup();
 		}
-		
+
 		return subs;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	@Transactional(readOnly = true)
-	public List<FormGroup> findAllFormSubmissions(int pageSize) {
-		return (List<FormGroup>) getCurrentSession().createCriteria(FormGroup.class)
-				.setMaxResults(pageSize).list();
+	public List<FormGroup> findAllFormSubmissions(int startItem, int pageSize) {
+		Criteria criteria = getCurrentSession().createCriteria(FormGroup.class).setFirstResult(startItem)
+				.setMaxResults(pageSize).addOrder(Order.asc("id"));
+		return (List<FormGroup>) criteria.list();
 	}
 
 	@Override
@@ -96,8 +99,8 @@ public class FormDaoImpl implements FormDao {
 	@Override
 	@Transactional(readOnly = true)
 	public FormGroup findFormSubmissionGroupById(long groupId) {
-		return (FormGroup) getCurrentSession().createCriteria(FormGroup.class)
-				.add(Restrictions.eq("id", groupId)).uniqueResult();
+		return (FormGroup) getCurrentSession().createCriteria(FormGroup.class).add(Restrictions.eq("id", groupId))
+				.uniqueResult();
 	}
 
 	@Override
@@ -127,5 +130,13 @@ public class FormDaoImpl implements FormDao {
 	public void deleteGroup(long groupId) {
 		FormGroup group = findFormSubmissionGroupById(groupId);
 		getCurrentSession().delete(group);
+	}
+
+	@Override
+	public long getFormGroupCount() {
+		Criteria criteria = getCurrentSession().createCriteria(FormGroup.class);
+		criteria.setProjection(Projections.rowCount());
+		Long count = (Long) criteria.uniqueResult();
+		return count;
 	}
 }

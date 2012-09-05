@@ -1,5 +1,23 @@
 #set ($page_header = "Form Groups")
 
+<p>
+	$startItem - $groupCnt of $totalCnt
+	<br />
+	#if ($previousPage)
+		<a href="$request.getContextPath()/admin/form/list/$previousPage">Previous</a>
+	#else
+		Previous
+	#end
+
+	&nbsp;
+	
+	#if ($nextPage)
+		<a href="$request.getContextPath()/admin/form/list/$nextPage">Next</a>
+	#else
+		Next
+	#end
+</p>
+
 <table border=1 cellpadding=5>
 	<tr>
 		<th>Form Id</th>
@@ -18,7 +36,25 @@
 				<td>Ongoing</td>
 			#end
 			<td>$sub.submissions.size()</td>
-			<td><a href="group/$sub.id">View Form Submission</a></td>
+			<td><a href="$request.getContextPath()/admin/form/group/$sub.id">View Form Submission</a></td>
 		</tr>
 	#end
 </table>
+
+<p>
+	$startItem - $groupCnt of $totalCnt
+	<br />
+	#if ($previousPage)
+		<a href="$request.getContextPath()/admin/form/list/$previousPage">Previous</a>
+	#else
+		Previous
+	#end
+
+	&nbsp;
+	
+	#if ($nextPage)
+		<a href="$request.getContextPath()/admin/form/list/$nextPage">Next</a>
+	#else
+		Next
+	#end
+</p>
