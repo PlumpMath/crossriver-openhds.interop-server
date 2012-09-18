@@ -10,8 +10,10 @@ import org.openhds.mobileinterop.model.AuthorityPK;
 import org.openhds.mobileinterop.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
+@Transactional
 public class UserDaoImpl implements UserDao {
 
 	private SessionFactory sessionFactory;
@@ -23,7 +25,8 @@ public class UserDaoImpl implements UserDao {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<User> getAllUsers() {
+	@Transactional(readOnly = true)
+	public List<User> findAllUsers() {
 		return (List<User>) getCurrentSession().createCriteria(User.class).add(Restrictions.ne("username", "admin"))
 				.list();
 	}
@@ -50,6 +53,7 @@ public class UserDaoImpl implements UserDao {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public User findUserById(String previousOwner) {
 		return (User) getCurrentSession().createCriteria(User.class).add(Restrictions.eq("username", previousOwner))
 				.uniqueResult();

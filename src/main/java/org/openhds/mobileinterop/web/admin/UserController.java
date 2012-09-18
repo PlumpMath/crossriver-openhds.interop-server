@@ -33,7 +33,7 @@ public class UserController extends AbstractUserController {
 	@RequestMapping(value = { "", "/" })
 	public ModelAndView managementView() {
 		ModelAndView mv = new ModelAndView("userManagement");
-		mv.addObject("userList", dao.getAllUsers());
+		mv.addObject("userList", dao.findAllUsers());
 
 		return mv;
 	}

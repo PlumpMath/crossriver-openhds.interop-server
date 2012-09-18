@@ -7,8 +7,10 @@ import org.hibernate.criterion.Restrictions;
 import org.openhds.mobileinterop.model.ApplicationSetting;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
+@Transactional
 public class ApplicationSettingDaoImpl implements ApplicationSettingDao {
 
 	private final SessionFactory factory;
@@ -34,13 +36,13 @@ public class ApplicationSettingDaoImpl implements ApplicationSettingDao {
 	}
 
 	private ApplicationSetting getPersistedSetting(String name) {
-		ApplicationSetting setting = (ApplicationSetting) factory
-				.getCurrentSession().createCriteria(ApplicationSetting.class)
-				.add(Restrictions.eq("name", name)).uniqueResult();
+		ApplicationSetting setting = (ApplicationSetting) factory.getCurrentSession()
+				.createCriteria(ApplicationSetting.class).add(Restrictions.eq("name", name)).uniqueResult();
 		return setting;
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public String readApplicationSetting(String name, String defaultValue) {
 		ApplicationSetting setting = getPersistedSetting(name);
 		if (setting == null) {
@@ -51,16 +53,16 @@ public class ApplicationSettingDaoImpl implements ApplicationSettingDao {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<ApplicationSetting> findSettingsForGroup(String groupName) {
-		List<ApplicationSetting> settings = (List<ApplicationSetting>) factory
-				.getCurrentSession().createCriteria(ApplicationSetting.class)
-				.add(Restrictions.eq("groupName", groupName)).list();
+		List<ApplicationSetting> settings = (List<ApplicationSetting>) factory.getCurrentSession()
+				.createCriteria(ApplicationSetting.class).add(Restrictions.eq("groupName", groupName)).list();
 		return settings;
 	}
 
 	@Override
 	public void saveSettings(List<ApplicationSetting> settings) {
-		for(ApplicationSetting set : settings) {
+		for (ApplicationSetting set : settings) {
 			saveApplicationSetting(set.getGroupName(), set.getName(), set.getValue());
 		}
 	}
