@@ -170,6 +170,10 @@ public class FormAdminController {
 	@RequestMapping(value = "/list/{pageNum}", method = RequestMethod.GET)
 	public ModelAndView getFormSubmissionListOnPage(@PathVariable int pageNum) {
 		long totalCnt = dao.getFormGroupCount();
+		if (totalCnt == 0) {
+			return new ModelAndView("viewFormSubmissions");
+		}
+		
 		int maxPages = (int) Math.ceil((double) totalCnt / PAGE_ITEM_COUNT);
 		if (pageNum <= 0 || pageNum > maxPages) {
 			return new ModelAndView("redirect:/admin/form/list");

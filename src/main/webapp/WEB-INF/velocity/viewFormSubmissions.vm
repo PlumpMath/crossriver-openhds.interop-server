@@ -1,60 +1,64 @@
 #set ($page_header = "Form Groups")
 
-<p>
-	$startItem - $groupCnt of $totalCnt
-	<br />
-	#if ($previousPage)
-		<a href="$request.getContextPath()/admin/form/list/$previousPage">Previous</a>
-	#else
-		Previous
-	#end
-
-	&nbsp;
+#if ($submissions)
+	<p>
+		$startItem - $groupCnt of $totalCnt
+		<br />
+		#if ($previousPage)
+			<a href="$request.getContextPath()/admin/form/list/$previousPage">Previous</a>
+		#else
+			Previous
+		#end
 	
-	#if ($nextPage)
-		<a href="$request.getContextPath()/admin/form/list/$nextPage">Next</a>
-	#else
-		Next
-	#end
-</p>
-
-<table border=1 cellpadding=5>
-	<tr>
-		<th>Form Id</th>
-		<th>Form Type</th>
-		<th>Status</th>
-		<th># of Submission's</th>
-		<th>View</th>
-	</tr>
-	#foreach ($sub in $submissions)
+		&nbsp;
+		
+		#if ($nextPage)
+			<a href="$request.getContextPath()/admin/form/list/$nextPage">Next</a>
+		#else
+			Next
+		#end
+	</p>
+	
+	<table border=1 cellpadding=5>
 		<tr>
-			<td>$sub.id</td>
-			<td>$sub.submissionGroupType</td>
-			#if ($sub.completed)
-				<td>Finished</td>
-			#else
-				<td>Ongoing</td>
-			#end
-			<td>$sub.submissions.size()</td>
-			<td><a href="$request.getContextPath()/admin/form/group/$sub.id">View Form Submission</a></td>
+			<th>Form Id</th>
+			<th>Form Type</th>
+			<th>Status</th>
+			<th># of Submission's</th>
+			<th>View</th>
 		</tr>
-	#end
-</table>
-
-<p>
-	$startItem - $groupCnt of $totalCnt
-	<br />
-	#if ($previousPage)
-		<a href="$request.getContextPath()/admin/form/list/$previousPage">Previous</a>
-	#else
-		Previous
-	#end
-
-	&nbsp;
+		#foreach ($sub in $submissions)
+			<tr>
+				<td>$sub.id</td>
+				<td>$sub.submissionGroupType</td>
+				#if ($sub.completed)
+					<td>Finished</td>
+				#else
+					<td>Ongoing</td>
+				#end
+				<td>$sub.submissions.size()</td>
+				<td><a href="$request.getContextPath()/admin/form/group/$sub.id">View Form Submission</a></td>
+			</tr>
+		#end
+	</table>
 	
-	#if ($nextPage)
-		<a href="$request.getContextPath()/admin/form/list/$nextPage">Next</a>
-	#else
-		Next
-	#end
-</p>
+	<p>
+		$startItem - $groupCnt of $totalCnt
+		<br />
+		#if ($previousPage)
+			<a href="$request.getContextPath()/admin/form/list/$previousPage">Previous</a>
+		#else
+			Previous
+		#end
+	
+		&nbsp;
+		
+		#if ($nextPage)
+			<a href="$request.getContextPath()/admin/form/list/$nextPage">Next</a>
+		#else
+			Next
+		#end
+	</p>
+#else
+	<p>There are no form submissions</p>
+#end
