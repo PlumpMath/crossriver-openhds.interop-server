@@ -1,6 +1,18 @@
 #set ($page_header = "Form Groups")
 
 #if ($submissions)
+
+	<p>
+		<form method="POST" action="$request.getContextPath()/admin/form/search">
+			<label>Find Form Group by Form Submission Id: <input type="text" size="20" name="formId"></label>
+			<input type="submit" value="Search for Form Group" />
+		</form>
+	</p>
+	
+	#if ($infoMsg)
+		<p style="color:red;font-weight:bold">$infoMsg</p>
+	#end
+	
 	<p>
 		$startItem - $groupCnt of $totalCnt
 		<br />
@@ -21,7 +33,7 @@
 	
 	<table border=1 cellpadding=5>
 		<tr>
-			<th>Form Id</th>
+			<th>Form Group Id</th>
 			<th>Form Type</th>
 			<th>Status</th>
 			<th># of Submission's</th>

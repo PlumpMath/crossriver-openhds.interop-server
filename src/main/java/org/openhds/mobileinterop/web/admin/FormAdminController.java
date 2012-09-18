@@ -7,6 +7,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpSession;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -32,6 +33,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.util.HtmlUtils;
 
@@ -46,6 +50,7 @@ import difflib.Patch;
 @RequestMapping("/admin/form")
 public class FormAdminController {
 	private static final int PAGE_ITEM_COUNT = 50;
+	private static final String INFO_MSG_ATTRIBUTE = "infoMsg";
 
 	private final static Logger logger = LoggerFactory.getLogger(FormAdminController.class);
 
@@ -58,6 +63,31 @@ public class FormAdminController {
 		this.dao = dao;
 		this.converter = converter;
 		this.appSettingDao = appSettingDao;
+	}
+
+	@RequestMapping(value = "/search", method = RequestMethod.POST)
+	public ModelAndView searchForFormById(@RequestParam(defaultValue = "0") String formId, HttpSession session) {
+		// ideally we don't use HttpSession
+		// but prior to Spring 3.1, RedirectView puts all model attributes into the URL
+		long parsedFormId;
+		ModelAndView mv = new ModelAndView();
+		try {
+			parsedFormId = Long.parseLong(formId);
+		} catch (NumberFormatException e) {
+			session.setAttribute(INFO_MSG_ATTRIBUTE, "You must provide the form id as a number, e.g. 105");
+			mv.setViewName("redirect:list");
+			return mv;
+		}
+
+		FormSubmission submission = dao.findFormSubmissionById(parsedFormId);
+		if (submission == null) {
+			session.setAttribute(INFO_MSG_ATTRIBUTE, "There was no form found with id: " + formId);
+			mv.setViewName("redirect:list");
+			return mv;
+		}
+
+		long groupId = submission.getGroup().getId();
+		return new ModelAndView("redirect:group/" + groupId);
 	}
 
 	@RequestMapping(value = "/group/{groupId}")
@@ -163,8 +193,14 @@ public class FormAdminController {
 	}
 
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
-	public ModelAndView getFormSubmissionList() {
-		return getFormSubmissionListOnPage(1);
+	public ModelAndView getFormSubmissionList(HttpSession session) {
+		Object infoMsg = session.getAttribute(INFO_MSG_ATTRIBUTE);
+		session.removeAttribute(INFO_MSG_ATTRIBUTE);
+		ModelAndView view = getFormSubmissionListOnPage(1);
+		if (infoMsg != null) {
+			view.addObject(INFO_MSG_ATTRIBUTE, infoMsg.toString());
+		}
+		return view;
 	}
 
 	@RequestMapping(value = "/list/{pageNum}", method = RequestMethod.GET)
@@ -173,7 +209,7 @@ public class FormAdminController {
 		if (totalCnt == 0) {
 			return new ModelAndView("viewFormSubmissions");
 		}
-		
+
 		int maxPages = (int) Math.ceil((double) totalCnt / PAGE_ITEM_COUNT);
 		if (pageNum <= 0 || pageNum > maxPages) {
 			return new ModelAndView("redirect:/admin/form/list");
@@ -196,7 +232,7 @@ public class FormAdminController {
 		mv.addObject("startItem", startItem + 1);
 		mv.addObject("groupCnt", startItem + group.size());
 		mv.addObject("totalCnt", totalCnt);
-		
+
 		mv.addObject("submissions", group);
 		return mv;
 	}
