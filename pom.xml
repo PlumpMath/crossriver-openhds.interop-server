@@ -4,7 +4,7 @@
     <groupId>ng.edu.unical</groupId>
     <artifactId>mobile-interop</artifactId>
     <packaging>war</packaging>
-    <version>1.3</version>
+    <version>1.4-SNAPSHOT</version>
 
     <name>Mobile Interop</name>
     <description>Interopability layer between Mirth and the OpenHDS</description>
