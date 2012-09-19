@@ -2,10 +2,14 @@ package org.openhds.mobileinterop.web.admin;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 import javax.xml.transform.OutputKeys;
@@ -22,8 +26,10 @@ import org.apache.commons.lang.StringUtils;
 import org.openhds.mobileinterop.FormTypeConverter;
 import org.openhds.mobileinterop.dao.ApplicationSettingDao;
 import org.openhds.mobileinterop.dao.FormDao;
+import org.openhds.mobileinterop.dao.FormDao.GroupFilter;
 import org.openhds.mobileinterop.model.FormGroup;
 import org.openhds.mobileinterop.model.FormSubmission;
+import org.openhds.mobileinterop.model.Pager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,8 +40,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttributes;
-import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.util.HtmlUtils;
 
@@ -51,24 +55,31 @@ import difflib.Patch;
 public class FormAdminController {
 	private static final int PAGE_ITEM_COUNT = 50;
 	private static final String INFO_MSG_ATTRIBUTE = "infoMsg";
+	private static final Logger logger = LoggerFactory.getLogger(FormAdminController.class);
+	private static final List<String> FORM_STATUS_VALUES = Arrays.asList("1", "2", "3", "4");
 
-	private final static Logger logger = LoggerFactory.getLogger(FormAdminController.class);
-
-	private FormDao dao;
-	private FormTypeConverter converter;
-	private ApplicationSettingDao appSettingDao;
+	private final FormDao dao;
+	private final FormTypeConverter converter;
+	private final ApplicationSettingDao appSettingDao;
+	private final Map<String, String> filterStatusValues;
 
 	@Autowired
 	public FormAdminController(FormDao dao, FormTypeConverter converter, ApplicationSettingDao appSettingDao) {
 		this.dao = dao;
 		this.converter = converter;
 		this.appSettingDao = appSettingDao;
+		filterStatusValues = new HashMap<String, String>();
+		filterStatusValues.put("1", "any");
+		filterStatusValues.put("2", "completed");
+		filterStatusValues.put("3", "active");
+		filterStatusValues.put("4", "errors");
 	}
 
 	@RequestMapping(value = "/search", method = RequestMethod.POST)
 	public ModelAndView searchForFormById(@RequestParam(defaultValue = "0") String formId, HttpSession session) {
 		// ideally we don't use HttpSession
 		// but prior to Spring 3.1, RedirectView puts all model attributes into the URL
+	    session.removeAttribute("currentFilter");
 		long parsedFormId;
 		ModelAndView mv = new ModelAndView();
 		try {
@@ -89,16 +100,21 @@ public class FormAdminController {
 		long groupId = submission.getGroup().getId();
 		return new ModelAndView("redirect:group/" + groupId);
 	}
-
+	
 	@RequestMapping(value = "/group/{groupId}")
-	public ModelAndView viewFormSubmission(@PathVariable long groupId) {
-		return buildSubmissionGroupView(groupId);
+	public ModelAndView viewFormSubmission(@PathVariable long groupId, HttpSession session) {
+	    GroupFilterFormatter currentFilter = (GroupFilterFormatter) session.getAttribute("currentFilter");
+	    if (currentFilter != null) {
+		    session.removeAttribute("currentFilter");
+		}
+	    return buildSubmissionGroupView(groupId, currentFilter);
 	}
 
-	private ModelAndView buildSubmissionGroupView(long groupId) {
+	private ModelAndView buildSubmissionGroupView(long groupId, GroupFilterFormatter formatter) {
 		FormGroup submissionGroup = dao.findFormSubmissionGroupById(groupId);
 		ModelAndView mv = new ModelAndView("viewSubmissionGroup");
 		mv.addObject("group", submissionGroup);
+		mv.addObject("currentFilter", formatter);
 		if (submissionGroup.getCompletedFormId() != null) {
 			mv.addObject("openhdsUrl", converter.getOpenHdsUrlForType(
 					appSettingDao.readApplicationSetting("openhdsUrl", "http://openhds.rcg.usm.maine.edu/openhds"),
@@ -118,7 +134,7 @@ public class FormAdminController {
 			dao.deleteGroup(groupId);
 			return new ModelAndView("redirect:/admin");
 		}
-		return buildSubmissionGroupView(groupId);
+		return buildSubmissionGroupView(groupId, null);
 	}
 
 	private List<Revision> calculateDiffs(FormGroup group) {
@@ -202,7 +218,7 @@ public class FormAdminController {
 		}
 		return view;
 	}
-
+	
 	@RequestMapping(value = "/list/{pageNum}", method = RequestMethod.GET)
 	public ModelAndView getFormSubmissionListOnPage(@PathVariable int pageNum) {
 		long totalCnt = dao.getFormGroupCount();
@@ -210,12 +226,12 @@ public class FormAdminController {
 			return new ModelAndView("viewFormSubmissions");
 		}
 
-		int maxPages = (int) Math.ceil((double) totalCnt / PAGE_ITEM_COUNT);
-		if (pageNum <= 0 || pageNum > maxPages) {
+		Pager pager = new Pager(PAGE_ITEM_COUNT, totalCnt);
+		if (!pager.isPageInRange(pageNum)) {
 			return new ModelAndView("redirect:/admin/form/list");
 		}
 
-		int startItem = (pageNum - 1) * PAGE_ITEM_COUNT;
+		int startItem = pager.getStartItemForPage(pageNum);
 
 		ModelAndView mv = new ModelAndView("viewFormSubmissions");
 
@@ -223,18 +239,100 @@ public class FormAdminController {
 			mv.addObject("previousPage", pageNum - 1);
 		}
 
-		if ((pageNum + 1) <= maxPages) {
+		if ((pageNum + 1) <= pager.getNumberOfPages()) {
 			mv.addObject("nextPage", pageNum + 1);
 		}
 
 		List<FormGroup> group = dao.findAllFormSubmissions(startItem, PAGE_ITEM_COUNT);
 
 		mv.addObject("startItem", startItem + 1);
-		mv.addObject("groupCnt", startItem + group.size());
 		mv.addObject("totalCnt", totalCnt);
-
+		mv.addObject("groupCnt", startItem + group.size());
 		mv.addObject("submissions", group);
 		return mv;
+	}
+	
+	@RequestMapping("/filter/{pageNum}")
+	public ModelAndView filterSubmissions(@PathVariable int pageNum, HttpSession session,
+			@RequestParam(defaultValue = "") String submitButton,
+			@RequestParam(defaultValue = "0") String filterStatus, @RequestParam(defaultValue = "") String formType) {
+		if ("clear".equalsIgnoreCase(submitButton)) {
+			return new ModelAndView("redirect:/admin/form/list");
+		}
+		GroupFilter filter = new GroupFilter();
+		if (!FORM_STATUS_VALUES.contains(filterStatus)) {
+			filterStatus = "1";
+		}
+		
+		filter.setFormStatus(filterStatusValues.get(filterStatus));
+		
+		if (StringUtils.isNotBlank(formType) && !"all".equalsIgnoreCase(formType)) {
+			filter.setFormType(formType);
+		}
+		
+		long totalCnt = dao.findFilterFormGroupsCount(filter);
+        if (totalCnt == 0) {
+            ModelAndView mv = new ModelAndView("viewFormSubmissions");
+            mv.addObject("filterStatus", filterStatus);
+            mv.addObject("formType", formType);
+
+            return mv;
+        }
+		
+		Pager pager = new Pager(PAGE_ITEM_COUNT, totalCnt);
+		if (!pager.isPageInRange(pageNum)) {
+			return new ModelAndView("redirect:/admin/form/list");
+		}
+		
+		int startItem = pager.getStartItemForPage(pageNum);
+		filter.setStartItem(startItem);
+		filter.setPageSize(PAGE_ITEM_COUNT);
+		List<FormGroup> group = dao.findAllFormGroups(filter);
+		
+		ModelAndView mv = new ModelAndView("viewFormSubmissions");
+		mv.addObject("startItem", startItem + 1);
+		mv.addObject("totalCnt", totalCnt);
+		mv.addObject("filterStatus", filterStatus);
+		mv.addObject("formType", formType);
+		mv.addObject("groupCnt", startItem + group.size());
+		if (pageNum > 1) {
+			mv.addObject("previousPage", pageNum - 1);
+		}
+
+		if ((pageNum + 1) <= pager.getNumberOfPages()) {
+			mv.addObject("nextPage", pageNum + 1);
+		}
+		
+		mv.addObject("submissions", group);
+		GroupFilterFormatter formatter = new GroupFilterFormatter(pageNum, filterStatus, formType);
+		session.setAttribute("currentFilter", formatter);
+		mv.addObject("filter", formatter);
+		return mv;
+	}
+	
+	public static class GroupFilterFormatter implements Serializable {
+
+		private String filterStatus;
+		private String formType;
+        private int pageNum;
+
+		public GroupFilterFormatter(int pageNum, String filterStatus, String formType) {
+			this.pageNum = pageNum;
+		    this.filterStatus = filterStatus;
+			this.formType = formType;
+		}
+		
+		@Override
+		public String toString() {
+			StringBuilder builder = new StringBuilder("?");
+			builder.append("filterStatus=" + filterStatus);
+			builder.append("&formType=" + formType);
+			return builder.toString();
+		}
+		
+		public String toStringWithPageNum() {
+		    return pageNum + toString();
+		}
 	}
 
 	public String prettyPrintXml(String xml) {

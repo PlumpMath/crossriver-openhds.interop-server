@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
@@ -138,5 +139,57 @@ public class FormDaoImpl implements FormDao {
 		criteria.setProjection(Projections.rowCount());
 		Long count = (Long) criteria.uniqueResult();
 		return count;
+	}
+
+	@Override
+	@Transactional(readOnly=true)
+	public List<FormGroup> findAllFormGroups(GroupFilter filter) {
+		Query query = buildQuery(filter, "distinct fg");
+		
+		query.setMaxResults(filter.getPageSize());
+		query.setFirstResult(filter.getStartItem());
+		
+		return query.list();
+	}
+
+	private Query buildQuery(GroupFilter filter, String projection) {
+		StringBuilder builder = new StringBuilder("select " + projection + " from FormGroup as fg");
+		boolean hasWhereClause = false;
+		
+		if ("completed".equalsIgnoreCase(filter.getFormStatus())) {
+			builder.append(" where fg.completedFormId is not null");
+			hasWhereClause = true;
+		} else if ("active".equalsIgnoreCase(filter.getFormStatus())) {
+			builder.append(" join fg.submissions as s");
+			builder.append(" where s.active = true");
+			hasWhereClause = true;
+		} else if ("errors".equalsIgnoreCase(filter.getFormStatus())) {
+			builder.append(" join fg.submissions as s");
+			builder.append(" join s.formErrors as e");
+			builder.append(" where s.active = true");
+			hasWhereClause = true;
+		}
+		
+		if (filter.hasFormType()) {
+			if (hasWhereClause) {
+				builder.append(" and fg.submissionGroupType = :formType");
+			} else {
+				builder.append(" where fg.submissionGroupType = :formType");
+			}
+		}
+		
+		builder.append(" order by fg.id");
+		
+		Query query = getCurrentSession().createQuery(builder.toString());
+		if (filter.hasFormType()) {
+			query.setString("formType", filter.getFormType());
+		}
+		return query;
+	}
+
+	@Override
+	public long findFilterFormGroupsCount(GroupFilter filter) {
+		Query query = buildQuery(filter, "count(distinct fg)");
+		return (Long) query.uniqueResult();
 	}
 }

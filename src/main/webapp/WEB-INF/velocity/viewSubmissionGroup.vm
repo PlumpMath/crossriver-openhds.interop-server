@@ -1,4 +1,8 @@
-<p><a href="$request.getContextPath()/admin/form/list">Back to listing</a><p>
+#if ($currentFilter)
+	<p><a href="$request.getContextPath()/admin/form/filter/$currentFilter.toStringWithPageNum()">Back to listing</a><p>
+#else
+	<p><a href="$request.getContextPath()/admin/form/list">Back to listing</a><p>
+#end
 
 <p><strong>Form Id</strong>: $group.id</p>
 <p><strong>Form Type</strong>: $group.submissionGroupType</p>

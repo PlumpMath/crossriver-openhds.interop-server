@@ -1,23 +1,68 @@
 #set ($page_header = "Form Groups")
 
-#if ($submissions)
+#if ($filter)
+	#set($linkSuffix = $filter.toString())
+	#set($resource = "filter")
+#else
+	#set($linkSuffix = "")
+	#set($resource = "list")
+#end
 
-	<p>
-		<form method="POST" action="$request.getContextPath()/admin/form/search">
-			<label>Find Form Group by Form Submission Id: <input type="text" size="20" name="formId"></label>
-			<input type="submit" value="Search for Form Group" />
-		</form>
-	</p>
-	
-	#if ($infoMsg)
-		<p style="color:red;font-weight:bold">$infoMsg</p>
-	#end
-	
+#if (!$filterStatus)
+	#set ($filterStatus = 1)
+#end
+
+#set ($filterOpts = ["Any", "Completed Forms", "Active Forms", "Active Forms With Errors"])
+#set ($optionValues = ["All", "Birth", "Death", "House", "Household", "In Migration", "Out Migration", "Pregnancy", "Vaccination", "Visit"])
+
+<p>
+	<form method="POST" action="$request.getContextPath()/admin/form/search">
+		<label>Find Form Group by Form Submission Id: <input type="text" size="20" name="formId"></label>
+		<input type="submit" value="Search for Form Group" />
+	</form>
+</p>
+
+#if ($infoMsg)
+	<p style="color:red;font-weight:bold">$infoMsg</p>
+#end
+
+<div>
+	<strong>Filtering Options</strong>
+	<br />
+	<br />
+	<form method="GET" action="$request.getContextPath()/admin/form/filter/1">
+		#foreach ($opt in $filterOpts)
+			#if ($filterStatus == $foreach.count)
+				<label><input type="radio" name="filterStatus" value="$foreach.count" checked="checked"/>$opt</label>
+			#else
+				<label><input type="radio" name="filterStatus" value="$foreach.count" />$opt</label>
+			#end
+		#end
+		<br />
+		<br />
+		<label>Form Type:</label>
+		<br />
+		<select name="formType">
+			#foreach ($opt in $optionValues)
+				#if ($formType == $opt)
+					<option value="$opt" selected="selected">$opt</option>
+				#else
+					<option value="$opt">$opt</option>	
+				#end
+			#end
+		</select>
+		<br />
+		<input type="submit" name="submitButton" value="Filter" />
+		<input type="submit" name="submitButton" value="Clear" />
+	</form>
+</div>
+
+#if ($submissions)
 	<p>
 		$startItem - $groupCnt of $totalCnt
 		<br />
 		#if ($previousPage)
-			<a href="$request.getContextPath()/admin/form/list/$previousPage">Previous</a>
+			<a href="$request.getContextPath()/admin/form/$resource/$previousPage$linkSuffix">Previous</a>
 		#else
 			Previous
 		#end
@@ -25,7 +70,7 @@
 		&nbsp;
 		
 		#if ($nextPage)
-			<a href="$request.getContextPath()/admin/form/list/$nextPage">Next</a>
+			<a href="$request.getContextPath()/admin/form/$resource/$nextPage$linkSuffix">Next</a>
 		#else
 			Next
 		#end
@@ -58,7 +103,7 @@
 		$startItem - $groupCnt of $totalCnt
 		<br />
 		#if ($previousPage)
-			<a href="$request.getContextPath()/admin/form/list/$previousPage">Previous</a>
+			<a href="$request.getContextPath()/admin/form/$resource/$previousPage$linkSuffix">Previous</a>
 		#else
 			Previous
 		#end
@@ -66,7 +111,7 @@
 		&nbsp;
 		
 		#if ($nextPage)
-			<a href="$request.getContextPath()/admin/form/list/$nextPage">Next</a>
+			<a href="$request.getContextPath()/admin/form/$resource/$nextPage$linkSuffix">Next</a>
 		#else
 			Next
 		#end
