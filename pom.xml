@@ -191,6 +191,21 @@
         <finalName>mobile-interop</finalName>
         <plugins>
             <plugin>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <webResources>
+                        <resource>
+                            <directory>src/main/webapp/WEB-INF/velocity</directory>
+                            <targetPath>WEB-INF/velocity</targetPath>
+                            <filtering>true</filtering>
+                            <includes>
+                                <include>version.vm</include>
+                            </includes>
+                        </resource>
+                    </webResources>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.mortbay.jetty</groupId>
                 <artifactId>maven-jetty-plugin</artifactId>
                 <version>6.1.10</version>

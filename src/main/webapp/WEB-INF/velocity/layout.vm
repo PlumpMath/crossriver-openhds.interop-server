@@ -7,6 +7,7 @@
 	</head>
 	<body>
 		<h1>Mobile Interop Server</h1>
+		#include ("version.vm")
 		<p><a href="$request.getContextPath()/">Go to Main Menu</a></p>
 		<h3>$!page_header</h3>
 		$screen_content
